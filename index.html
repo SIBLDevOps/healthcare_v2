@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BeyondSure – Online Doctor Consultation &amp; Health Membership</title>
+  <meta name="description"
+    content="Talk to certified doctors on video, get digital prescriptions, and stay ahead of illness. One BeyondSure membership for teleconsultation, dental care, fitness access, travel insurance and medicine delivery.">
+  <meta name="theme-color" content="#1964ee">
+
+  <!-- Favicons (BeyondSure live URLs) -->
+  <link rel="icon" href="https://teleconsult.bysure.in/favicon.ico?v=4">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://teleconsult.bysure.in/favicon-32x32.png?v=4">
+  <link rel="apple-touch-icon" href="https://teleconsult.bysure.in/apple-touch-icon.png?v=4">
+
+  <!-- Fonts: Figtree (BeyondSure brand) + Plus Jakarta Sans (headings) -->
+  <!-- Early connections to the servers this page loads from (faster first load) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://teleconsult.bysure.in">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+
+  <!-- Bootstrap 5 + Bootstrap Icons + AOS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+
+
+  <!-- =====================================================================
+     TOP BAR
+     ===================================================================== -->
+  <div class="bys-topbar d-none d-md-block">
+    <div class="bys-topbar-inner">
+      <p><i class="bi bi-heart-pulse"></i> Beyond Insurance. Into Wellness.</p>
+      <div class="bys-topbar-links">
+        <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i>
+          support@shrigodahealthcare.com</a>
+        <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+     HEADER
+     ===================================================================== -->
+  <header class="bys-site-header" id="siteHeader">
+    <div class="bys-header-inner">
+      <a class="bys-logo" href="index.html" aria-label="BeyondSure home">
+        <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" width="146"
+          height="40">
+      </a>
+
+      <nav class="bys-menu-pill" aria-label="Main">
+        <a href="doctor/find-doctor.html">Find a Doctor</a>
+        <a href="lab-tests/index.html">Lab Tests</a>
+        <a href="medicines/index.html">Medicines</a>
+        <a href="dental/index.html">Dental</a>
+        <a href="fitness/index.html">Cult Fitness</a>
+        <a href="shop/shop.html">Shop</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="bys-header-actions">
+        <a class="bys-icon-btn" href="cart/cart.html" aria-label="Basket, empty"><i class="bi bi-basket2"></i></a>
+        <a class="bys-login-link" href="https://teleconsult.bysure.in/login">Log in</a>
+        <a class="bys-btn-brand" href="https://teleconsult.bysure.in/register">Register</a>
+        <button class="bys-icon-btn bys-menu-toggle" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Open menu"><i
+            class="bi bi-list"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="offcanvas offcanvas-end bys-mobile-menu" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header">
+      <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" height="34"
+        id="mobileMenuLabel">
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="bys-m-link" href="doctor/find-doctor.html">Find a Doctor <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="lab-tests/index.html">Diagnostic Lab Tests <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="medicines/index.html">Medicines Delivery <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="dental/index.html">Dental Care & Clinics <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="fitness/index.html">Cult.fit Fitness Pass <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="shop/shop.html">Shop <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="#services">All Services <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="#how-it-works">How It Works <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="#contact">Contact <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="https://teleconsult.bysure.in/login">Log in <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-btn-brand w-100 mt-4" href="https://teleconsult.bysure.in/register">Register</a>
+      <div class="bys-m-contact">
+        <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i>
+          support@shrigodahealthcare.com</a>
+        <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="bys-site-wrap" id="main">
+
+    <!-- =================================================================
+       HERO
+       ================================================================= -->
+    <section class="bys-hero" id="top">
+      <div class="bys-hero-inner">
+        <div class="bys-hero-copy">
+          <span class="bys-tag-pill" data-aos="fade-up"><i class="bi bi-plus-lg"></i><span>Beyond Insurance. Into
+              Wellness.</span></span>
+          <h1 data-aos="fade-up" data-aos-delay="80">Your Health Deserves More Than A <span class="bys-hl">Claim
+              Form.</span></h1>
+          <p data-aos="fade-up" data-aos-delay="160">We're not a hospital — we're your health habit. Talk to certified
+            doctors on video, get digital prescriptions, and stay ahead of illness instead of waiting for something to
+            go wrong.</p>
+          <div class="bys-hero-ctas" data-aos="fade-up" data-aos-delay="240">
+            <a class="bys-btn-brand" href="doctor/find-doctor.html">Book a Consultation <i
+                class="bi bi-arrow-right"></i></a>
+            <a class="bys-btn-brand-outline" href="#services">Explore Services</a>
+          </div>
+          <ul class="bys-hero-points" data-aos="fade-up" data-aos-delay="320">
+            <li><i class="bi bi-camera-video"></i> Join from any browser, no installs</li>
+            <li><i class="bi bi-file-earmark-medical"></i> e-Prescription as PDF</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Hero visual: phone-in-hand image with floating cards (original section layout) -->
+      <div class="bys-hero-visual" aria-hidden="true">
+        <div class="bys-float-card bys-fc-1">
+          <div class="bys-avatars"><span>🩺</span><span>🦷</span><span>💊</span></div>
+          <div class="bys-big">24+</div>
+          <div class="bys-float-small">Medical Specialties</div>
+        </div>
+
+        <div class="bys-float-card bys-fc-2">
+          <span class="bys-ico"><i class="bi bi-patch-check"></i></span>
+          <div>
+            <div class="bys-title">Certified Doctors</div>
+            <div class="bys-muted">Video consults &amp; e-prescriptions</div>
+          </div>
+        </div>
+
+        <div class="bys-float-card bys-fc-3">
+          <div class="bys-title">Consultations From</div>
+          <div class="bys-big mt-1" style="font-size:24px">Rs. 450</div>
+          <div class="bys-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:50%"></i><i
+              style="height:85%"></i><i style="height:70%"></i><i style="height:100%"></i></div>
+        </div>
+
+        <img class="bys-hero-phone" src="assets/images/hero.png"
+          srcset="assets/images/hero-640.png 640w, assets/images/hero-900.png 900w, assets/images/hero.png 1212w"
+          sizes="(max-width: 991.98px) 460px, 590px" alt="" decoding="async" fetchpriority="high">
+      </div>
+
+      <div class="bys-hero-marquee" aria-hidden="true">
+        <div class="bys-marquee-track"
+          data-marquee="Teleconsultation|Dental Care|Medicine Delivery|Fitness Access|Travel Insurance"></div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+       BROWSE BY SPECIALTY (original section design)
+       ================================================================= -->
+    <section class="bys-section bys-specialty-panel" id="specialties" aria-labelledby="specTitle">
+      <div data-aos="fade-up">
+        <span class="bys-tag-pill"><i class="bi bi-plus-lg"></i><span>Our Specialists</span></span>
+        <h2 class="bys-sec-title" id="specTitle">Browse By Specialty</h2>
+      </div>
+      <div class="bys-logo-marquee">
+        <div class="bys-marquee-track" id="specRow1"></div>
+      </div>
+      <div class="bys-logo-marquee">
+        <div class="bys-marquee-track bys-reverse" id="specRow2"></div>
+      </div>
+      <a class="bys-link-line" href="doctor/find-doctor.html">View All Doctors</a>
+    </section>
+
+    <!-- =================================================================
+       MIND GYM
+       ================================================================= -->
+    <section class="bys-section bys-mind-panel" id="mind-gym" aria-labelledby="mindTitle">
+      <div data-aos="fade-up">
+        <span class="bys-tag-pill"><i class="bi bi-plus-lg"></i><span>Mind Gym</span></span>
+        <h2 class="bys-sec-title" id="mindTitle">🧠 Take 5 Minutes For Your Mind</h2>
+        <p class="bys-sec-lead">Play. Pause. Reflect. Feel better.</p>
+      </div>
+
+      <div class="row g-4 bys-mind-grid">
+        <div class="col-lg-4" data-aos="fade-up">
+          <article class="bys-mind-card">
+            <div class="bys-top"><span class="bys-mind-avatar">🧩</span><span class="bys-mind-eyebrow">Today’s Mind
+                Gym<br>Challenge</span></div>
+            <div class="bys-quote-mark">“</div>
+            <h3>What Comes Next?</h3>
+            <p class="bys-mind-text">What comes next? 7 → 21 → 63 → 189 → ?</p>
+            <div class="bys-card-cta"><a class="bys-btn-theme"
+                href="https://teleconsult.bysure.in/patient/mind-gym">Start Challenge</a></div>
+          </article>
+        </div>
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="120">
+          <article class="bys-mind-card" id="tipCard">
+            <div class="bys-top"><span class="bys-mind-avatar">🌿</span><span
+                class="bys-mind-eyebrow">Feeling<br>Stressed?</span></div>
+            <div class="bys-quote-mark">“</div>
+            <h3>A Wellness Tip For Today</h3>
+            <p class="bys-mind-text bys-muted" id="tipText">One small, practical thing you can try in the next few
+              minutes.</p>
+            <div class="bys-card-cta" id="tipCta"><button type="button" class="bys-btn-theme-outline" id="tipBtn">Get a
+                Wellness Tip</button></div>
+          </article>
+        </div>
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="240">
+          <article class="bys-mind-card">
+            <div class="bys-top"><span class="bys-mind-avatar">🤝</span><span class="bys-mind-eyebrow">Need
+                Personal<br>Support?</span></div>
+            <div class="bys-quote-mark">“</div>
+            <h3>Talk To Someone Qualified</h3>
+            <p class="bys-mind-text">If you would like more than a few minutes for your mind, our doctors are here.</p>
+            <div class="bys-card-cta"><a class="bys-btn-theme-outline" href="https://teleconsult.bysure.in/doctors">Find
+                a Professional</a></div>
+          </article>
+        </div>
+      </div>
+      <p class="bys-mind-note" data-aos="fade-up">Mind Gym is for everyday wellbeing. It is not a diagnosis, a test, or
+        a substitute for medical care.</p>
+    </section>
+
+    <!-- =================================================================
+       CONSULT OUR DOCTORS
+       ================================================================= -->
+    <section class="bys-section bys-inner" id="doctors" aria-labelledby="docTitle">
+      <div class="row g-4 g-lg-5 align-items-center">
+        <div class="col-lg-6 ps-lg-5" data-aos="fade-left">
+          <span class="bys-tag-pill"><i class="bi bi-plus-lg"></i><span>Our Doctors</span></span>
+          <h2 class="bys-sec-title" id="docTitle">Consult Our Doctors</h2>
+          <div class="bys-doc-list" id="doctorList"></div>
+          <div class="bys-doc-actions">
+            <a class="bys-btn-brand" href="doctor/find-doctor.html">View All Doctors <i class="bi bi-arrow-right"></i></a>
+            <div class="bys-talk">
+              <i class="bi bi-whatsapp"></i>
+              <div>
+                <p>Talk to us on WhatsApp</p><a href="https://wa.me/919830024236">+91 98300 24236</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-right">
+          <div class="bys-doc-visual" aria-hidden="true">
+            <div class="bys-faded">Consult<br>Online</div>
+            <!-- HTML video-call mock (no theme images) -->
+            <div class="bys-call-ui">
+              <div class="bys-call-head"><span class="bys-dot"></span> Live · 12:45 <span class="bys-hd">HD</span></div>
+              <div class="bys-call-main">
+                <span class="bys-call-avatar">V</span>
+                <strong>Dr. Vikrant Shinde</strong>
+                <small>Ayurveda · 10 yrs experience</small>
+                <span class="bys-call-self"><i class="bi bi-person-fill"></i></span>
+              </div>
+              <div class="bys-call-ctrl">
+                <span><i class="bi bi-mic"></i></span><span><i class="bi bi-camera-video"></i></span><span class="bys-end"><i class="bi bi-telephone-x"></i></span><span><i class="bi bi-chat-dots"></i></span>
+              </div>
+              <div class="bys-call-rx"><i class="bi bi-file-earmark-medical"></i><span><b>e-Prescription.pdf</b><small>Arrives right after your call</small></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+       SERVICES
+       ================================================================= -->
+    <section class="bys-section bys-inner" id="services" aria-labelledby="svcTitle">
+      <div class="row bys-svc-head g-4" data-aos="fade-up">
+        <div class="col-lg-6">
+          <span class="bys-tag-pill"><i class="bi bi-plus-lg"></i><span>One Membership</span></span>
+          <h2 class="bys-sec-title" id="svcTitle">One Membership. Everything Your Health Needs.</h2>
+        </div>
+        <div class="col-lg-5 offset-lg-1">
+          <p>Teleconsultation is live today — and your membership grows with every service we launch.</p>
+        </div>
+      </div>
+      <div class="bys-filter-tabs" role="tablist" aria-label="Filter services" data-aos="fade-up">
+        <button type="button" class="is-active" data-filter="all" role="tab" aria-selected="true">All Services</button>
+        <button type="button" data-filter="live" role="tab" aria-selected="false">Live Now</button>
+        <button type="button" data-filter="soon" role="tab" aria-selected="false">Coming Soon</button>
+      </div>
+      <div class="row g-4 bys-svc-grid" id="serviceGrid"></div>
+    </section>
+
+    <!-- =================================================================
+       HOW IT WORKS
+       ================================================================= -->
+    <section class="bys-section bys-how bys-inner" id="how-it-works" aria-labelledby="howTitle">
+      <div data-aos="fade-up">
+        <span class="bys-tag-pill"><i class="bi bi-plus-lg"></i><span>How It Works</span></span>
+        <h2 class="bys-sec-title" id="howTitle">Getting Started Takes Less Than 5 Minutes.</h2>
+      </div>
+      <div class="row bys-steps" id="stepGrid"></div>
+      <div class="bys-how-ctas" data-aos="fade-up">
+        <a class="bys-btn-brand-outline" href="doctor/find-doctor.html">Find a Doctor</a>
+        <a class="bys-btn-brand" href="https://teleconsult.bysure.in/register">Your Healthiest Year Starts Today <i
+            class="bi bi-arrow-right"></i></a>
+      </div>
+    </section>
+
+    <!-- =================================================================
+       FAQ
+       ================================================================= -->
+    <section class="bys-section bys-faq bys-inner" id="faq" aria-labelledby="faqTitle">
+      <div data-aos="fade-up">
+        <span class="bys-tag-pill"><i class="bi bi-plus-lg"></i><span>Quick Answers</span></span>
+        <h2 class="bys-sec-title" id="faqTitle">Questions We Hear All The Time</h2>
+      </div>
+      <div class="bys-faq-wrap" id="faqList"></div>
+      <a class="bys-btn-brand" href="#contact" data-aos="fade-up">Ask Us Anything <i class="bi bi-arrow-right"></i></a>
+    </section>
+
+    <!-- =================================================================
+       CONTACT
+       ================================================================= -->
+    <section class="bys-section bys-contact-panel" id="contact" aria-labelledby="contactTitle">
+      <div class="row g-4 align-items-center px-lg-3">
+        <div class="col-lg-6" data-aos="fade-right">
+          <span class="bys-tag-pill"><i class="bi bi-plus-lg"></i><span>Reach Out</span></span>
+          <h2 class="bys-sec-title" id="contactTitle">Talk To Us</h2>
+          <p class="bys-sec-lead">Questions about consultations, memberships, or partnerships? We'd love to hear from
+            you.</p>
+          <div class="bys-contact-list">
+            <div class="bys-icon-box">
+              <span class="bys-icon-circle"><i class="bi bi-geo-alt"></i></span>
+              <div>
+                <h5>Office</h5>
+                <p class="bys-desc">203, Shivam Square, 4 Sahar Road, Andheri (E), Mumbai 400069, Maharashtra, India</p>
+              </div>
+            </div>
+            <div class="bys-icon-box">
+              <span class="bys-icon-circle"><i class="bi bi-envelope"></i></span>
+              <div>
+                <h5>Email</h5>
+                <p class="bys-desc"><a href="mailto:support@shrigodahealthcare.com">support@shrigodahealthcare.com</a>
+                </p>
+              </div>
+            </div>
+            <div class="bys-icon-box">
+              <span class="bys-icon-circle bys-green"><i class="bi bi-whatsapp"></i></span>
+              <div>
+                <h5>WhatsApp</h5>
+                <p class="bys-desc"><a href="https://wa.me/919830024236">+91 98300 24236</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+          <form class="bys-form-card" id="contactForm" novalidate>
+            <h3>Send Us A Message</h3>
+            <div class="row g-3">
+              <div class="col-sm-6"><label class="bys-f-label" for="cfName">Your name</label><input class="bys-field"
+                  id="cfName" type="text" name="name" placeholder="Your name" required autocomplete="name"></div>
+              <div class="col-sm-6"><label class="bys-f-label" for="cfEmail">Email</label><input class="bys-field"
+                  id="cfEmail" type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+              </div>
+              <div class="col-sm-6"><label class="bys-f-label" for="cfPhone">Phone <span>(optional)</span></label><input
+                  class="bys-field" id="cfPhone" type="tel" name="phone" placeholder="+91" autocomplete="tel"></div>
+              <div class="col-sm-6"><label class="bys-f-label" for="cfSubject">Subject</label><input class="bys-field"
+                  id="cfSubject" type="text" name="subject" placeholder="Subject"></div>
+              <div class="col-12"><label class="bys-f-label" for="cfMsg">How can we help?</label><textarea
+                  class="bys-field" id="cfMsg" name="message" rows="4" placeholder="How can we help?"
+                  required></textarea></div>
+              <div class="col-12"><button class="bys-btn-brand" type="submit" id="sendBtn">Send Message <i
+                    class="bi bi-send"></i></button></div>
+            </div>
+            <p class="bys-form-status" id="formStatus" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+       MARQUEE BAND
+       ================================================================= -->
+    <div class="bys-band bys-section" aria-hidden="true">
+      <div class="bys-marquee-track" data-marquee="Preventive Care|Made A Daily Habit|Beyond Insurance|Into Wellness">
+      </div>
+    </div>
+
+    <!-- =================================================================
+       FOOTER
+       ================================================================= -->
+    <footer class="bys-site-footer">
+      <!-- Brand row: logo (left) | tagline (right) -->
+      <div class="ft-top">
+        <div class="bys-ft-brand">
+          <a href="index.html" class="bys-ft-logo" aria-label="BeyondSure home"><img
+              src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure"></a>
+          <p class="bys-ft-tagline">Preventive care, made a daily habit. Talk to certified doctors on video, get digital
+            prescriptions, and stay ahead of illness.</p>
+        </div>
+      </div>
+
+      <div class="bys-ft-line"></div>
+
+      <!-- Link columns -->
+      <div class="bys-ft-cols">
+        <div class="bys-ft-col bys-ft-touch">
+          <h5>Get In Touch</h5>
+          <ul>
+            <li><i class="bi bi-envelope"></i><a
+                href="mailto:support@shrigodahealthcare.com">support@shrigodahealthcare.com</a></li>
+            <li><i class="bi bi-telephone"></i><a href="https://wa.me/919830024236">+91 98300 24236</a></li>
+            <li><i class="bi bi-geo-alt"></i><span>203, Shivam Square, 4 Sahar Road, Andheri (E), Mumbai 400069,
+                Maharashtra, India</span></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="doctor/find-doctor.html">Find a Doctor</a></li>
+            <li><a href="lab-tests/index.html">Diagnostic Lab Tests</a></li>
+            <li><a href="medicines/index.html">Medicines Delivery</a></li>
+            <li><a href="dental/index.html">Dental Care</a></li>
+            <li><a href="fitness/index.html">Cult.fit Fitness</a></li>
+            <li><a href="shop/shop.html">Shop</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="doctor/find-doctor.html">Teleconsultation</a></li>
+            <li><a href="lab-tests/index.html">Diagnostic Labs</a></li>
+            <li><a href="medicines/index.html">Medicine Delivery</a></li>
+            <li><a href="dental/index.html">Dental Care Plans</a></li>
+            <li><a href="fitness/index.html">Cult.fit Pass</a></li>
+            <li><a href="#services">All Services</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="https://teleconsult.bysure.in/patient/mind-gym">Mind Gym</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Account</h5>
+          <ul>
+            <li><a href="https://teleconsult.bysure.in/login">Log in</a></li>
+            <li><a href="https://teleconsult.bysure.in/register">Register</a></li>
+            <li><a href="cart/cart.html">Basket</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="bys-ft-bottom">
+        <nav aria-label="Footer">
+          <a href="#services">Services</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <p>© <span id="year">2026</span> BeyondSure. All rights reserved.</p>
+      </div>
+    </footer>
+  </main>
+
+  <button class="bys-to-top" id="toTop" type="button" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+
+</html>

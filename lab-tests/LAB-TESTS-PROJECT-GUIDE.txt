@@ -1,0 +1,744 @@
+===============================================================================================
+                    BEYONDSURE - LAB TESTS MODULE
+                    Complete Project Guide, User Flow and Technical Report
+===============================================================================================
+
+Folder        : BeyondSure-Original-Website/lab-tests/
+Type          : Front-end (static website) - HTML, CSS, JavaScript, Bootstrap 5.3
+Status        : Complete clickable demo with dummy data (ready to connect to a real backend)
+Report date   : 20 November 2026
+Written for   : Team members, seniors, testers (QA), designers and backend developers
+
+
+-----------------------------------------------------------------------------------------------
+TABLE OF CONTENTS
+-----------------------------------------------------------------------------------------------
+ 1.  What is this project? (in simple words)
+ 2.  How to open and run it
+ 3.  Demo login and "Demo tools"
+ 4.  Technology used and project rules
+ 5.  Folder and file map
+ 6.  How the code works (architecture)
+ 7.  COMPLETE USER FLOW - step by step (with flow chart)
+ 8.  Page-by-page details
+ 9.  Business rules (all the "rules" the app follows)
+10.  Family members - how it works
+11.  Login and Register
+12.  Prescription upload flow
+13.  Booking status timeline (after booking)
+14.  Lab partner and Admin pages (platform demo)
+15.  Where data is stored + demo data list
+16.  Test checklist for QA (ready-to-use scenarios)
+17.  Mobile bottom app menu (index.html)
+18.  How to make it live (connect a real backend)
+19.  Known limits and assumptions
+20.  Glossary (simple meaning of words used)
+21.  Summary of recent changes
+
+
+===============================================================================================
+1. WHAT IS THIS PROJECT? (IN SIMPLE WORDS)
+===============================================================================================
+
+The Lab Tests module lets a person book medical lab tests (blood tests, health packages,
+scans) for themselves and their family, from partner labs near them.
+
+In short, a user can:
+  - Choose their location (pincode) and how they want the test done:
+      * Home Sample Collection - a technician comes home to take the sample, or
+      * Visit Lab Centre       - the user goes to a partner lab.
+  - Search tests, open health packages, or upload a doctor's prescription.
+  - Add tests to a "Lab Cart" and choose WHICH family member each test is for.
+  - Compare partner labs (price, rating, report time) and pick one.
+  - Pick a home address (or a lab centre), a date and a time slot.
+  - Apply a coupon, pay, and get a booking confirmation.
+  - Track the booking (technician, sample, report), reschedule or cancel it.
+  - View and download reports for each family member.
+
+It is a "multi-lab marketplace": many labs, one website, user chooses the lab.
+
+Important: right now everything works with DUMMY (sample) data saved in the browser.
+No real server, payment or SMS is used yet. Section 18 explains how to connect a real backend.
+
+
+===============================================================================================
+2. HOW TO OPEN AND RUN IT
+===============================================================================================
+
+Option A (easiest):
+  Double-click  lab-tests/index.html   - it opens in the browser and works directly.
+
+Option B (local server, recommended for testing):
+  Open the main website folder with any static server (for example VS Code "Live Server")
+  and go to  /lab-tests/index.html
+
+Nothing to install. No build step. No npm.
+The main site home page (../index.html) already links to Lab Tests.
+
+Tip: After any code change, press  Ctrl + F5  in the browser to load fresh files.
+
+
+===============================================================================================
+3. DEMO LOGIN AND "DEMO TOOLS"
+===============================================================================================
+
+Demo account
+  Mobile : 9876543210   (Riya Malhotra - has 4 family members)
+  OTP    : 123456       (the OTP is ALWAYS 123456 in the demo, for any number)
+
+"Demo tools" button (bottom-left corner of every page) - for testing only:
+  - Login as demo user (with family) / Logout
+  - New user (fresh login - only "Self", no family, no bookings)
+  - Toggle mode (Home Collection <-> Lab Centre)
+  - Simulate API error on the next call (to see error screens)
+  - Payment result: success / failed / processing (to test payment screens)
+  - Advance booking status (moves a booking to its next step)
+  - Mark prescription request as identified (simulates our team's call)
+  - Reset demo data (restores all original sample data)
+  - Jump to any page
+  To hide the Demo tools, add  ?demo=0  to the page address. (?demo=1 shows them again.)
+
+"Reset demo data" is also available in the footer.
+
+
+===============================================================================================
+4. TECHNOLOGY USED AND PROJECT RULES
+===============================================================================================
+
+  - HTML5, CSS3, plain JavaScript (no React/Angular), Bootstrap 5.3, Bootstrap Icons.
+  - Works even when opened as a file (file://) - no server needed.
+  - Uses the main website theme: ../assets/css/style.css (same header, footer, colours,
+    buttons, fonts as the rest of BeyondSure).
+  - All extra styles for Lab Tests are ONLY in:  lab-tests/assets/css/lab.css
+  - Fully responsive: desktop, tablet and mobile. Popups become "bottom sheets" on mobile.
+  - All code lives inside the  lab-tests/  folder. Other website folders are not changed.
+  - Accessibility: keyboard support, labels for screen readers, visible focus outlines.
+
+
+===============================================================================================
+5. FOLDER AND FILE MAP
+===============================================================================================
+
+lab-tests/
+|
+|-- index.html                  Landing page + location popup (location + collection type)
+|-- search.html                 Search tests and packages, filters
+|-- test-detail.html?id=...     One test in detail
+|-- packages.html               Health packages
+|-- prescription-upload.html    Upload a doctor's prescription
+|-- my-requests.html            "My Prescription Requests" (status of uploads)
+|-- cart.html                   Lab Cart - tests grouped by family member
+|-- select-lab.html             Choose a partner lab (compare, sort, filter)
+|-- location.html               Choose home address (or confirm lab centre)
+|-- slot.html                   Choose date and time slot
+|-- summary.html                Review order, coupon, bill and payment
+|-- confirmation.html?id=...    Booking confirmed
+|-- appointments.html           My Appointments (list)
+|-- appointment-detail.html?id= One booking: tracking, reschedule, cancel, feedback, support
+|-- reports.html                My Reports (list)
+|-- report-view.html?id=...     One report
+|-- lab-partner/register.html   Lab partner registration (platform demo)
+|-- lab-partner/dashboard.html  Lab partner dashboard (platform demo)
+|-- admin/lab-approvals.html    Admin approves new labs (platform demo)
+|-- README.md                   Short technical readme
+|-- LAB-TESTS-PROJECT-GUIDE.txt This document
+|
+|-- assets/css/lab.css          All Lab Tests styles
+|
+|-- assets/js/core/             Shared "engine" used by every page
+|     store.js        Saves app state (cart, user, location...) in the browser
+|     api.js          Fake server - every data request goes through here (LT.api)
+|     pricing.js      Price, bill, discounts, coupons
+|     matching.js     Which lab can do which test; gender/age rules for members
+|     cart.js         Add / remove tests, which member gets which test
+|     members-ui.js   "Select Member" popup, Add/Edit member form, Family Members popup
+|     ui.js           Common UI parts: popups, toasts, login popup, cards, money format...
+|     layout.js       Header, footer, step bar, cart bar, Demo tools, global clicks
+|     guards.js       Stops users from skipping steps (redirects to the right page)
+|
+|-- assets/js/data/             Dummy data (later this becomes the database)
+|     cities.js       Cities, areas, pincodes, which pincodes are served
+|     tests.js        All tests (price, fasting, report time, home/centre)
+|     packages.js     Health packages
+|     labs.js         Partner labs and their centres
+|     members.js      Demo family members
+|     addresses.js    Demo saved addresses
+|     slots.js        Time slots generator
+|     coupons.js      Coupon codes
+|     bookings.js     Demo bookings
+|     reports.js      Demo reports
+|     requests.js     Demo prescription requests
+|     ocr.js          Sample prescription reading data (not used in the live flow)
+|     lab-portal.js   Data for lab partner / admin demo pages
+|
+|-- assets/js/pages/            One script per page (index.js for index.html, etc.)
+
+How a page is built: each .html file is a thin "shell". The header, footer, step bar,
+cart bar and popups are added by layout.js / ui.js, and the page content is drawn by its
+own script in assets/js/pages/.
+
+
+===============================================================================================
+6. HOW THE CODE WORKS (ARCHITECTURE)
+===============================================================================================
+
+   +-------------------+       +------------------+       +---------------------+
+   |  data/*.js        | ----> |  core/api.js     | ----> |  pages/*.js         |
+   |  (dummy database) |       |  (fake server,   |       |  (draws each page)  |
+   +-------------------+       |   LT.api.*)      |       +----------+----------+
+                               +--------+---------+                  |
+                                        |                            v
+                               +--------v---------+       +---------------------+
+                               |  core/store.js   | <---> |  core/layout.js     |
+                               |  (browser memory:|       |  core/ui.js         |
+                               |   cart, user...) |       |  core/members-ui.js |
+                               +------------------+       |  core/guards.js     |
+                                                          +---------------------+
+
+  - Every page asks LT.api for data (like a real server). LT.api answers after a short
+    delay, like a real network call, and can show errors (Demo tools -> API error).
+  - LT.store keeps the current booking in the browser (location, mode, cart, members,
+    chosen lab, address, slot, coupon). It survives page refresh.
+  - LT.db (inside store.js) keeps "server-side" demo records: members, addresses,
+    bookings, reports, requests, labs status.
+  - guards.js makes sure the order of steps is followed. Example: if someone opens
+    slot.html without choosing a lab, they are sent to select-lab.html with a message.
+  - All global objects start with "LT." (Lab Tests) so they never clash with the main site.
+
+
+===============================================================================================
+7. COMPLETE USER FLOW - STEP BY STEP
+===============================================================================================
+
+FLOW CHART (main booking journey)
+
+  [Open Lab Tests]
+        |
+        v
+  [Location popup] -- search area/pincode or "Use my current location"
+        |              shows which services are available there
+        |
+        +-- Not served (outside Pune & Mumbai) --> "Service not available" + Change location
+        |
+        +-- Only one service available --> it is selected automatically
+        |
+        +-- Both available --> user picks Home Sample Collection OR Visit Lab Centre
+        |
+        v
+  [Landing page] -- search / packages / popular tests / upload prescription
+        |
+        v
+  [Click "Add" on a test]
+        |
+        +-- Not logged in --> [Login / Register popup] (OTP)
+        |
+        v
+  [Select Member popup] -- tick who the test is for (Self / family / add new member)
+        |
+        v
+  [Lab Cart] -- tests grouped per person, fix warnings, add more tests
+        |
+        v
+  [Select Lab] -- compare labs, sort, filter, pick one (or auto-assign)
+        |
+        v
+  [Location step] -- Home: pick saved address (same pincode)  /  Centre: confirm centre
+        |
+        v
+  [Slot] -- pick date + 1-hour time window (slot is held for 10 minutes)
+        |
+        v
+  [Summary & Pay] -- review, coupon, bill, payment method
+        |
+        +-- Payment failed --> retry
+        |
+        v
+  [Confirmation] -- booking ID, add to calendar, invoice, share
+        |
+        v
+  [My Appointments] --> [Appointment detail]
+        |                   tracking, reschedule, cancel, remove member,
+        |                   check-in (centre), feedback, support, repeat order
+        v
+  [My Reports] --> [Report view]
+
+
+STEP-BY-STEP (what the user does and sees)
+
+Step 1 - Open the Lab Tests page
+  The first time, the "Select your location" popup opens.
+
+Step 2 - Choose location and collection type (ONE popup)
+  - Type an area, city or 6-digit pincode in the search box, or tap
+    "Use my current location". (There is no list of popular cities - search only.)
+  - Suggestions appear as you type (they float above the popup, never cut off).
+  - A "service card" shows the result:
+      * Green  "All services available"   - two cards: Home Sample Collection and Visit Lab
+                                            Centre. The user taps one. Continue is enabled
+                                            after a choice.
+      * Amber  "Some services available"  - the available one is "Selected for you".
+      * Red    "Service not available at your location" - only Pune and Mumbai are served.
+               Buttons: "Pune" / "Mumbai" (searches that city) and "Change location".
+               Optional "Get notified when we launch" (mobile or email).
+  - Continue saves location + type and opens the landing page.
+  - Change later from the header (location chip / Home-Lab switch).
+
+Step 3 - Find tests
+  Search bar, categories, popular tests, health packages, or upload a prescription.
+
+Step 4 - Add a test
+  - Not logged in? The "Login to continue" popup opens first (Login / Register tabs).
+  - Then the "Select Member" popup: small cards (2 per row on desktop) for Self and family
+    members, plus "Add family member". Tick one or more people (max 6 per booking).
+  - Blocked members are disabled with the reason (example: PSA test is for men only).
+  - Members with an incomplete profile show "Complete profile".
+  - A test already in the cart re-opens the popup to change members or remove the test.
+  - If a package already contains the test, a "duplicate" prompt appears.
+
+Step 5 - Lab Cart
+  - Tests are grouped under each person (avatar, name, tests, subtotal).
+  - Per test: change members or remove. "Add test for <name>". Chips to book for other
+    family members or add a new one.
+  - Warnings: centre-only tests in home mode, duplicates per person, fasting needed.
+  - "Continue to Select Lab" is disabled until every test has a member.
+
+Step 6 - Select Lab
+  - Lab cards with price, rating, report time, collection charge.
+  - Sort, filters, compare up to 3 labs, map/list view in centre mode, lab details drawer.
+  - If a lab cannot do every test, a "partial coverage" popup explains it.
+  - Changing the lab recalculates prices and clears the slot.
+
+Step 7 - Location step
+  - Home Collection: saved addresses are shown ONLY if they match the chosen pincode.
+    Addresses from other pincodes are hidden with a note. "+ Add" opens a form; the
+    pincode is fixed to the chosen location (with a "Change location" link).
+  - Lab Centre: confirm which centre to visit (with map and directions).
+
+Step 8 - Slot (Select Collection Date & Time)
+  - Header: "For <members> - <lab name>".
+  - 7 date pills (example FRI 20, SAT 21). The selected day shows "12 Slots".
+    Days with no slots show "Full".
+  - "MORNING SLOTS" with a "Fasting Recommended" badge when a test needs fasting.
+  - 12 one-hour windows: 05:30-06:30 AM, 06:00-07:00 AM ... 11:00 AM-12:00 PM.
+  - Same-day slots need 2 hours notice (earlier ones are greyed out).
+  - "Confirm Slot (Sat, 21 Nov - 05:30 AM)" holds the slot for 10 minutes.
+
+Step 9 - Summary and Pay
+  - Part 1: members and tests, prescription, location, lab, slot, coupons, bill, consent.
+  - Part 2: payment method - UPI, Card, Net banking, Wallet, or Pay at collection/centre.
+  - A countdown shows the slot hold time; if it expires, the user picks a slot again.
+
+Step 10 - Confirmation
+  - Booking ID (copy), summary, preparation tips.
+  - Add to calendar (.ics file), invoice, share, view appointment, book another.
+
+Step 11 - After booking
+  - My Appointments -> open a booking -> see the live tracking timeline.
+  - Reports become available per family member when ready.
+
+
+===============================================================================================
+8. PAGE-BY-PAGE DETAILS
+===============================================================================================
+
+index.html (Landing)
+  - Location popup (location + collection type together, search only, service card).
+  - Hero: heading, search bar with suggestions, "Book Lab Test" and "Upload Prescription".
+  - Sections: prescription banner, how it works, categories, popular tests, packages by
+    life stage, testimonials, FAQs and more.
+  - Sticky cart bar at the bottom when the cart has tests ("From Rs.X - N tests - View Cart").
+
+search.html
+  - Search box, quick chips, filters, results for tests and packages, Add buttons.
+
+test-detail.html?id=
+  - Overview, preparation, parameters, which labs offer it, Add button.
+
+packages.html
+  - Packages with details drawer. Overlap rule: warns if a package already includes a
+    test in the cart.
+
+prescription-upload.html
+  - Add prescription pages (file, camera or gallery), patient and doctor details, submit.
+  - A popup says our team will call and confirm the tests.
+
+my-requests.html
+  - Tabs: All / Action needed / In review / Confirmed.
+  - Request details: status timeline, identified tests (untick, replace, add).
+  - Confirm -> tests go into the cart for that member.
+
+cart.html
+  - See Step 5 above.
+
+select-lab.html
+  - See Step 6 above.
+
+location.html
+  - See Step 7 above. Only addresses of the chosen pincode are shown. No live-location
+    button or map in home mode (removed on request).
+
+slot.html
+  - See Step 8 above. On mobile the Confirm button sticks to the bottom of the screen.
+
+summary.html
+  - See Step 9 above. Payment result can be simulated from Demo tools.
+
+confirmation.html?id=
+  - See Step 10. Clears the cart and booking details (user data stays).
+
+appointments.html
+  - List of bookings (upcoming and past) with status chips.
+
+appointment-detail.html?id=
+  - Header (booking ID, lab, call lab, support, invoice).
+  - Tracking timeline (with technician card and ETA in home mode).
+  - Members and reports, preparation reminders, QR code + check-in (centre mode),
+    bill and payment.
+  - Manage booking:
+      * Reschedule  - same lab, maximum 2 times, closes 2 hours before the slot.
+      * Remove a member - recalculates the bill, partial refund.
+      * Cancel booking - reason is required; refund preview is shown.
+        If reason = "Other": a text box (10 to 300 characters, required) and an
+        optional supporting document (JPG / PNG / PDF, up to 5 MB). Both are saved and
+        shown on the cancelled booking (image can be opened in a viewer).
+      * Feedback (stars + tags + comment) after completion; repeat order.
+      * Help & support (FAQs + raise a request).
+
+reports.html / report-view.html?id=
+  - Labs share every report as a PDF file (one PDF per test).
+  - reports.html: per family member, a list of  Report name | Lab & date | Result | View | Download.
+    "View" opens the PDF in a viewer popup (phones open it in their own PDF viewer);
+    "Download" saves the PDF (e.g. Riya_CBC_Report_20261115.pdf). Reports not ready yet show
+    "Track".
+  - report-view.html?id=...: all PDF files of one booking for one member, with View /
+    Download / "Download all", a built-in PDF preview on desktop, the lab's summary, Share
+    securely (OTP link), Consult a doctor and Book follow-up test.
+  - Demo: the PDF is generated from sample data (core/report-pdf.js). In production the API
+    returns the URL of the PDF uploaded by the lab (LT.api.getReportFile -> url).
+  - Printable documents share one BeyondSure design (taken from the official Tax Invoice):
+    logo + company details, navy title with a status badge, blue line, rounded detail boxes,
+    light-header table, notes + summary boxes and a centred footer. This applies to every lab
+    report PDF and to the booking Tax Invoice (Invoice button on Confirmation and Appointment
+    detail; invoice number format SH<FY>DG<booking digits>, amounts as "Rs. 0.00").
+
+lab-partner/register.html, lab-partner/dashboard.html, admin/lab-approvals.html
+  - See section 14.
+
+
+===============================================================================================
+9. BUSINESS RULES
+===============================================================================================
+
+Service area
+  - Served cities: ONLY Pune and Mumbai.
+      411057 (Wakad, Hinjewadi), 411045 (Baner), 411038 (Kothrud),
+      400001 (Fort), 400069 (Andheri East)  -> Home Collection + Lab Centre
+      411014 (Viman Nagar)                 -> Home Collection only
+      411005 (Shivajinagar)                -> Lab Centre only
+  - Not served (appear in search with "Service not available"): Delhi, Bangalore,
+    Hyderabad, Chennai, Kolkata, Ahmedabad, Dhule, Nashik, Nagpur, Jaipur, and any
+    pincode not in the list.
+  - If a saved location stops being served, the home page asks for a new location and
+    booking pages redirect back (guards.js).
+
+Collection type
+  - Imaging tests (Ultrasound, X-Ray, ECG) are Lab Centre only; they are blocked in
+    Home mode.
+  - Switching type resets the chosen lab, address/centre and slot (cart stays).
+
+Prices
+  - MRP (printed price) is the same at every lab. Each lab sells at its own price
+    (lab price factor), so the user can compare.
+  - Lab tests are GST-exempt, so tax shows Rs.0.
+  - Collection charge is charged once per booking (some labs give it free above an
+    amount).
+
+Coupons (demo)
+  CARE15     15% off up to Rs.300, on orders above Rs.499
+  FIRSTMED   Flat Rs.120 off, first lab booking only
+  HEALTH100  Flat Rs.100 off, on orders above Rs.999
+  HOMEONLY   10% off home collection (up to Rs.200), home mode only
+  EXPIRED10  Expired coupon - shows the "expired" error (for testing)
+
+Members
+  - Every test in the cart must belong to at least one family member.
+  - Maximum 6 members per booking.
+  - Gender / age rules (example: PSA is only for men aged 40 or more; some other tests
+    have a minimum age, e.g. 12+). Members who do not match are disabled with the reason.
+  - The "Self" member's relationship cannot be changed.
+
+Slots
+  - 12 one-hour morning windows from 05:30 AM to 12:00 PM, every day, for every lab.
+  - Same-day slots need at least 2 hours notice.
+  - A chosen slot is held for 10 minutes until payment.
+
+Booking and payment
+  - A booking starts as "pending payment" and becomes "confirmed" after successful
+    payment. "Pay at collection / centre" confirms straight away.
+
+Changes and refunds
+  - Reschedule: same lab only, maximum 2 times, not within 2 hours of the slot.
+  - Changes close 2 hours before the slot or once the technician is on the way.
+  - Refund on cancel: more than 12 hours before the slot -> 100%;
+                      2 to 12 hours before   -> 50%;
+                      within 2 hours         -> no refund.
+  - Refunds go back to the original payment method in 5-7 working days.
+
+
+===============================================================================================
+10. FAMILY MEMBERS - HOW IT WORKS
+===============================================================================================
+
+  - Every account has "Self". The demo account also has: Karan (Spouse), Ishaan (Child),
+    Usha (Mother) and Rajesh (Father).
+  - A brand-new user (Demo tools -> New user) has only "Self" and "Add family member".
+  - Where to manage: Profile menu -> "Family Members" (also in the mobile menu and footer).
+    Cards show name, relationship, age, gender, mobile, email and tests in cart, with
+    Edit / Complete profile / Remove (Self cannot be removed).
+  - Adding a member from inside the Select Member popup returns to the popup with that
+    member already ticked.
+  - Removing a member also removes their tests from the cart (after confirmation).
+  - Members, bookings, requests and reports belong to the logged-in mobile number, so a
+    new account never sees another account's data.
+
+
+===============================================================================================
+11. LOGIN AND REGISTER
+===============================================================================================
+
+  - One popup with two tabs: Login and Register.
+  - Login: mobile number -> Get OTP -> enter OTP (demo OTP 123456).
+  - Register asks: full name (letters only), date of birth (must be 18+), gender,
+    mobile, email (optional), consent (required) -> OTP.
+    This creates a complete "Self" profile.
+  - Smart checks:
+      * A new number on the Login tab -> switches to Register with a note.
+      * An already registered number on the Register tab -> "Please log in instead".
+  - Logout clears the cart and current booking details.
+
+
+===============================================================================================
+12. PRESCRIPTION UPLOAD FLOW
+===============================================================================================
+
+  1. Upload Prescription -> add all pages (file / camera / gallery) -> choose patient,
+     doctor name and date -> Submit.
+  2. Popup: "Our team will connect with you" to confirm the tests.
+  3. My Prescription Requests shows the request as "In review".
+  4. The team identifies the tests (in the demo: Demo tools -> "Mark request as
+     identified").
+  5. The user reviews the identified tests (can untick, replace or add) -> Confirm.
+  6. The tests go into the cart for that member and the normal booking flow continues.
+
+
+===============================================================================================
+13. BOOKING STATUS TIMELINE (AFTER BOOKING)
+===============================================================================================
+
+Home Sample Collection
+  Booked -> Confirmed by lab -> Technician assigned -> On the way -> Sample collected
+  -> Sample received at lab -> Processing -> Report ready
+
+Lab Centre Visit
+  Booked -> Confirmed by lab -> Lab visit done -> Sample received at lab -> Processing
+  -> Report ready
+
+Other statuses: Cancelled, Completed. In the demo, "Advance status" moves a booking one
+step forward. When the report is ready the feedback popup can appear.
+
+
+===============================================================================================
+14. LAB PARTNER AND ADMIN PAGES (PLATFORM DEMO)
+===============================================================================================
+
+lab-partner/register.html
+  3 steps: 1 Business details (with mobile OTP) -> 2 Documents -> 3 Test catalogue and
+  service area -> submit. The application is "pending".
+
+admin/lab-approvals.html
+  Table of applications (Pending / Approved / Rejected / Needs info), documents popup,
+  Approve, Reject with reason, or ask for more info. Approving makes the lab visible in
+  Select Lab. (Demo: approve "Aarogya Pathology" -> it appears for pincode 411057.)
+
+lab-partner/dashboard.html
+  Tabs: New bookings (confirm / reject), Today's collections (assign technician, update
+  status), Reports (upload per member -> Report ready), Performance, Settlements.
+
+
+===============================================================================================
+15. WHERE DATA IS STORED + DEMO DATA LIST
+===============================================================================================
+
+Browser storage (localStorage) keys:
+  lt_state_v2   Current session: user, location, mode, cart, members per test,
+                chosen lab, address, slot, coupon, payment simulation.
+  lt_db_v2      Demo "database": members, addresses, bookings, reports, requests,
+                lab applications, reviews, notify-me list.
+  lt_seeded_v2  Marks that demo data has been loaded once.
+  "Reset demo data" clears these and loads the original sample data again.
+
+Demo partner labs (Pune): BeyondSure Care Labs, Apollo Diagnostics, Manipal Diagnostic
+  Services, Metro Path Labs, City Health Lab, Sanjeevani Diagnostics (+ Aarogya Pathology
+  after admin approval). Some labs also serve Mumbai.
+
+Demo account: 9876543210 - Riya Malhotra (Self), Karan (Spouse), Ishaan (Child),
+  Usha (Mother), Rajesh (Father). Demo booking: LT-2026-004821.
+
+
+===============================================================================================
+16. TEST CHECKLIST FOR QA (READY-TO-USE SCENARIOS)
+===============================================================================================
+
+Tip: start with Demo tools -> "Reset demo data" for a clean state.
+
+[ ] A. First visit: open index.html -> location popup opens, search box is focused.
+[ ] B. Type "bane" -> pick "Baner, Pune" -> "All services available" -> choose
+       Home Sample Collection -> Continue -> landing page loads.
+[ ] C. Change location -> type 411014 -> Home is "Selected for you" (centre not available).
+[ ] D. Change location -> type "Dhule" -> "Service not available" -> tap "Mumbai" ->
+       suggestions for Mumbai appear.
+[ ] E. Logged out -> Add CBC -> Login popup -> OTP 123456 -> Select Member popup.
+[ ] F. Tick Riya + Karan -> Add -> button shows "Added - 2".
+[ ] G. Try to add PSA for Riya -> she is disabled (men only).
+[ ] H. Cart -> tests grouped per person -> remove one test for one person only.
+[ ] I. Select Lab -> sort, filter, compare 3 labs -> choose one.
+[ ] J. Location step -> only addresses of the chosen pincode are shown.
+[ ] K. Slot -> today shows "Full" if too late -> pick tomorrow 05:30 AM -> Confirm.
+[ ] L. Summary -> coupon CARE15 works, EXPIRED10 shows an error.
+[ ] M. Demo tools -> Payment result "failed" -> Pay -> retry works.
+[ ] N. Pay successfully -> Confirmation page -> download .ics / invoice.
+[ ] O. Appointment detail -> Advance status -> timeline moves forward.
+[ ] P. Reschedule twice -> third time shows "limit reached".
+[ ] Q. Cancel -> reason "Other" -> type less than 10 characters -> error shown;
+       add text + a PDF -> cancelled banner shows the reason and the file.
+[ ] R. Prescription -> upload -> request "In review" -> Demo tools "Mark identified"
+       -> confirm -> tests appear in the cart.
+[ ] S. Demo tools -> New user -> only Self + "Add family member"; no old bookings.
+[ ] T. Register a new number -> age under 18 is rejected.
+[ ] U. Mobile (375px) and tablet (768px): no sideways scroll; cart bar fully visible;
+       popups open as bottom sheets.
+[ ] V. Admin approvals -> approve Aarogya Pathology -> it appears in Select Lab (411057).
+
+
+===============================================================================================
+17. MOBILE BOTTOM APP MENU (index.html)
+===============================================================================================
+
+What it is
+  On phones (screens narrower than 768px) the landing page index.html shows an app-style
+  menu fixed at the bottom of the screen:
+    Lab Tests | Packages | Cart (round centre button with the cart count) | Appointments | Reports
+  - Lab Tests is highlighted (you are on that page).
+  - The cart count updates by itself when tests are added or removed.
+  - Tablet and desktop do NOT show it; their layout is unchanged.
+  - The header is unchanged on every screen size.
+
+Where the code is
+  - Markup: assets/js/pages/index.js ("MOBILE BOTTOM APP MENU" block). The page adds the
+    class "lt-has-bnav" to <body>.
+  - Styles: assets/css/lab.css ("Mobile bottom app menu" block, classes lt-bnav-*).
+
+Nothing hides behind it
+  - The cart bar, Demo tools button and Back-to-top button sit above the menu.
+  - The footer gets extra bottom space so its last line can be read.
+  - Hero search suggestions stop above the menu and the cart bar.
+
+(The old preview page index-2.html was removed; only this bottom menu was kept.)
+
+
+===============================================================================================
+18. HOW TO MAKE IT LIVE (CONNECT A REAL BACKEND)
+===============================================================================================
+
+The front-end was built so the backend can be connected with minimum changes.
+
+1. core/api.js - replace each LT.api function body with a real fetch() call to a REST
+   API. Keep the SAME function names and the SAME response shapes; pages need no change.
+   Main functions (grouped):
+     Location   : searchLocations, checkServiceability, reverseGeocode, notifyMe
+     Catalogue  : getCategories, suggestTests, searchTests, getTest, getPackages,
+                  getPackage, getPopular
+     Cart       : getCartDetails, getItems
+     Login      : sendOtp, verifyOtp, checkMobile, logout
+     Members    : getMembers, saveMember, archiveMember, validateAssignments
+     Labs       : getEligibleLabs, autoAssignLab, getLab, compareLabs
+     Address    : getAddresses, saveAddress, deleteAddress, validateAddressForLab
+     Slots      : getSlots, holdSlot
+     Billing    : getCoupons, applyCoupon, getBillSummary, createBooking, pay
+     Bookings   : getBookings, getBooking, rescheduleBooking, cancelBooking,
+                  removeMemberFromBooking, checkIn, repeatOrder, saveReview, submitSupport
+     Reports    : getReports, getReport, shareReport
+     Prescription: uploadPrescription, saveRequest, getRequests, confirmRequest,
+                  convertRequestToCart, updateRequest
+     Partner/Admin: registerLab, getLabApplications, setLabStatus, getLabBookings,
+                  updateLabBooking, uploadReportDemo, getTechnicians, getSettlements
+2. core/store.js - move cart / session to the server; keep the LT.store interface
+   (get, set, subscribe, clearBooking).
+3. data/*.js - become database tables; the fields in these files are the schema.
+4. pricing.js and matching.js - move price, bill, coupon and lab-matching logic to the
+   server for security. The browser should only display the results.
+5. Replace OTP 123456 with real SMS OTP, the fake payment with a payment gateway, and
+   send prescriptions to a review queue for the team.
+6. File uploads (prescriptions, cancellation documents) must go to secure server storage
+   (the demo keeps only small image previews in the browser).
+
+
+===============================================================================================
+19. KNOWN LIMITS AND ASSUMPTIONS
+===============================================================================================
+
+  - All data is sample data stored in the browser. Clearing browser data resets it.
+  - Different browsers / devices do not share data (no server yet).
+  - OTP, payment, SMS, maps and live location are simulated.
+  - "Use my current location" always returns Wakad, Pune 411057 in the demo.
+  - Cancellation documents: images are saved as a small preview; PDFs save only the name
+    and size (the real file must go to the server later).
+  - Only morning slots exist (as per the approved design). Every slot is a fixed 1-hour
+    window, whatever the number of family members in the booking.
+
+
+===============================================================================================
+20. GLOSSARY (SIMPLE MEANING OF WORDS USED)
+===============================================================================================
+
+  Home Sample Collection - a technician (phlebotomist) visits home to take the sample.
+  Lab Centre Visit       - the user goes to the partner lab centre.
+  Pincode                - 6-digit Indian postal code used to check service area.
+  Serviceable            - we can provide the service at that pincode.
+  MRP                    - maximum retail (printed) price of a test.
+  Package                - a group of tests sold together at a lower price.
+  Fasting                - not eating for some hours before the test.
+  TAT                    - turnaround time: how long until the report is ready.
+  NABL / CAP             - quality accreditations of labs.
+  Slot hold              - the chosen time is reserved for 10 minutes until payment.
+  Guard                  - a check that sends the user back if a required step is missing.
+  Bottom sheet           - a popup that slides up from the bottom on mobile.
+  Demo tools             - testing shortcuts; not part of the final product.
+
+
+===============================================================================================
+21. SUMMARY OF RECENT CHANGES
+===============================================================================================
+
+  - Family member flow: every Add asks "who is this test for"; cart grouped per person;
+    members.html removed; Family Members popup in the profile menu.
+  - Login popup now also has Register (name, DOB 18+, gender, mobile, email, consent).
+  - Location step: only addresses matching the pincode; live-location button and map
+    removed for home mode.
+  - Slot page redesigned: date pills, 12 one-hour morning slots, fasting badge,
+    "Confirm Slot" button (sticky on mobile).
+  - Cancel booking: reason "Other" asks for text + optional document upload.
+  - Location popup: clear service card (which service is / is not available); collection
+    type chosen inside the same popup (separate "How would you like..." popup removed);
+    popular cities removed (search only); one clear (x) button; suggestions float above
+    the popup.
+  - Service area limited to Pune and Mumbai, with a "Service not available - Change
+    location" message for other cities; more cities added to search (Dhule, Nashik,
+    Nagpur, Jaipur).
+  - Cart bar fixed on mobile and tablet (fully on screen).
+  - Mobile bottom app menu added to index.html (phones only). Preview page index-2.html
+    removed.
+
+===============================================================================================
+                                         END OF DOCUMENT
+===============================================================================================

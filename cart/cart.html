@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Basket – BeyondSure Shop</title>
+  <meta name="description" content="Shop Ayurvedic and wellness products from BeyondSure and Shrigoda Healthcare – hair care, liver care, immunity, digestion and more.">
+  <meta name="theme-color" content="#1964ee">
+
+  <!-- Favicons (BeyondSure live URLs) -->
+  <link rel="icon" href="https://teleconsult.bysure.in/favicon.ico?v=4">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://teleconsult.bysure.in/favicon-32x32.png?v=4">
+  <link rel="apple-touch-icon" href="https://teleconsult.bysure.in/apple-touch-icon.png?v=4">
+
+  <!-- Fonts: Figtree (BeyondSure brand) + Plus Jakarta Sans (headings) -->
+  <!-- Early connections to the servers this page loads from (faster first load) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://teleconsult.bysure.in">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+
+  <!-- Bootstrap 5 + Bootstrap Icons + AOS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+
+  <!-- Site styles (shared by all pages) -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    @media screen and (max-width: 767.98px) {
+      .dp-hero-inner {
+        padding: 96px 16px 20px;
+      }
+    }
+  </style>
+</head>
+<body class="bys-page-shop bys-page-cart">
+
+<!-- =====================================================================
+     TOP BAR
+     ===================================================================== -->
+<div class="bys-topbar d-none d-md-block">
+  <div class="bys-topbar-inner">
+    <p><i class="bi bi-heart-pulse"></i> Beyond Insurance. Into Wellness.</p>
+    <div class="bys-topbar-links">
+      <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i> support@shrigodahealthcare.com</a>
+      <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     HEADER
+     ===================================================================== -->
+<header class="bys-site-header" id="siteHeader">
+  <div class="bys-header-inner">
+    <a class="bys-logo" href="../index.html" aria-label="BeyondSure home">
+      <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" width="146" height="40">
+    </a>
+
+    <nav class="bys-menu-pill" aria-label="Main">
+      <a href="../doctor/find-doctor.html">Find a Doctor</a>
+      <a href="../lab-tests/index.html">Lab Tests</a>
+      <a href="../medicines/index.html">Medicines</a>
+      <a href="../dental/index.html">Dental</a>
+      <a href="../fitness/index.html">Cult Fitness</a>
+      <a href="../shop/shop.html">Shop</a>
+      <a href="../index.html#services">Services</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+
+    <div class="bys-header-actions">
+      <a class="bys-icon-btn bys-cart-btn is-active" href="cart.html" aria-current="page" aria-label="Basket" data-cart-link><i class="bi bi-basket2"></i><span class="bys-cart-badge" data-cart-count hidden>0</span></a>
+      <a class="bys-login-link" href="https://teleconsult.bysure.in/login">Log in</a>
+      <a class="bys-btn-brand" href="https://teleconsult.bysure.in/register">Register</a>
+      <button class="bys-icon-btn bys-menu-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Open menu"><i class="bi bi-list"></i></button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile menu -->
+<div class="offcanvas offcanvas-end bys-mobile-menu" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+  <div class="offcanvas-header">
+    <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" height="34" id="mobileMenuLabel">
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <a class="bys-m-link" href="../doctor/find-doctor.html">Find a Doctor <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../lab-tests/index.html">Diagnostic Lab Tests <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../medicines/index.html">Medicines Delivery <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../dental/index.html">Dental Care & Clinics <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../fitness/index.html">Cult.fit Fitness Pass <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../shop/shop.html">Shop <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../index.html#services">All Services <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../index.html#how-it-works">How It Works <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="../index.html#contact">Contact <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-m-link" href="https://teleconsult.bysure.in/login">Log in <i class="bi bi-chevron-right"></i></a>
+    <a class="bys-btn-brand w-100 mt-4" href="https://teleconsult.bysure.in/register">Register</a>
+    <div class="bys-m-contact">
+      <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i> support@shrigodahealthcare.com</a>
+      <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+    </div>
+  </div>
+</div>
+
+<main class="bys-site-wrap" id="main">
+
+  <!-- =================================================================
+       BREADCRUMB
+       ================================================================= -->
+  <section class="dp-hero ct-hero" aria-label="Basket">
+    <span class="fd-plus p1" aria-hidden="true">+</span>
+    <div class="dp-hero-inner">
+      <nav class="fd-crumbs" aria-label="Breadcrumb">
+        <a href="../index.html">Home</a>
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        <a href="../shop/shop.html">Shop</a>
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        <span aria-current="page">Basket</span>
+      </nav>
+    </div>
+  </section>
+
+  <section class="ct-body">
+
+    <!-- ---------- Page head ---------- -->
+    <div class="ct-head" data-aos="fade-up">
+      <div class="ct-head-text">
+        <h1 class="ct-title">Your basket <span class="ct-count" id="ctCount" hidden>0 items</span></h1>
+        <p>Review your wellness essentials before checkout.</p>
+      </div>
+      <a class="bys-btn-brand-outline ct-continue" href="../shop/shop.html"><i class="bi bi-arrow-left"></i> Continue shopping</a>
+    </div>
+
+    <!-- ---------- Basket (filled by cart.js) ---------- -->
+    <div class="ct-layout" id="ctLayout" hidden>
+      <div class="ct-main">
+
+        <!-- Cart items -->
+        <div class="ct-card ct-items-card" data-aos="fade-up">
+          <h2 class="ct-h2"><span class="dp-ic"><i class="bi bi-bag-check"></i></span> Cart Items <span id="ctItemsCount">(0)</span></h2>
+          <ul class="ct-items" id="ctItems"></ul>
+        </div>
+      </div>
+
+      <aside class="ct-aside" aria-label="Order summary">
+        <!-- Price details -->
+        <div class="ct-card ct-summary" id="ctSummary" data-aos="fade-up">
+          <h2 class="ct-h2"><span class="dp-ic"><i class="bi bi-receipt"></i></span> Price Details</h2>
+          <dl class="ct-rows" id="ctRows"></dl>
+
+          <!-- Coupon (sits under "Delivery Fee") -->
+          <form class="ct-coupon" id="ctCoupon" novalidate>
+            <div class="ct-coupon-row">
+              <div class="ct-coupon-field">
+                <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                <label class="visually-hidden" for="ctCode">Coupon code</label>
+                <input type="text" id="ctCode" placeholder="Apply coupon" autocomplete="off" maxlength="20">
+              </div>
+              <button type="submit" class="ct-apply">Apply</button>
+            </div>
+            <p class="ct-coupon-msg" id="ctCouponMsg" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="ct-total">
+            <span>Total Amount</span>
+            <strong id="ctTotal">₹0.00</strong>
+          </div>
+          <p class="ct-note" id="ctGstNote"></p>
+          <div class="ct-save" id="ctSave" hidden><i class="bi bi-stars"></i> <span></span></div>
+          <a class="bys-btn-brand ct-checkout" href="https://teleconsult.bysure.in/login" id="ctCheckout"><i class="bi bi-lock"></i> Proceed to checkout</a>
+          <ul class="ct-trust">
+            <li><i class="bi bi-shield-check"></i> Secure payment via Razorpay</li>
+            <li><i class="bi bi-truck"></i> Free delivery</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ---------- Empty basket ---------- -->
+    <div class="fd-empty ct-empty" id="ctEmpty" hidden>
+      <span class="fd-empty-ico"><i class="bi bi-basket2"></i></span>
+      <h3>Your basket is empty</h3>
+      <p>Browse the wellness store and add products to get started.</p>
+      <a class="bys-btn-brand" href="../shop/shop.html">Go to Shop <i class="bi bi-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- phone / tablet: total + checkout bar -->
+  <div class="ct-bar" id="ctBar" hidden>
+    <div class="ct-bar-total">
+      <strong id="ctBarTotal">₹0.00</strong>
+      <a href="#ctSummary">View detailed bill</a>
+    </div>
+    <a class="bys-btn-brand ct-bar-btn" href="https://teleconsult.bysure.in/login"><i class="bi bi-lock"></i> Place Order &amp; Pay</a>
+  </div>
+
+  <!-- =================================================================
+       MARQUEE BAND
+       ================================================================= -->
+  <div class="bys-band bys-section" aria-hidden="true">
+    <div class="bys-marquee-track" data-marquee="Preventive Care|Made A Daily Habit|Beyond Insurance|Into Wellness"></div>
+  </div>
+
+  <!-- =================================================================
+       FOOTER
+       ================================================================= -->
+  <footer class="bys-site-footer">
+    <div class="ft-top">
+      <div class="bys-ft-brand">
+        <a href="../index.html" class="bys-ft-logo" aria-label="BeyondSure home"><img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure"></a>
+        <p class="bys-ft-tagline">Preventive care, made a daily habit. Talk to certified doctors on video, get digital prescriptions, and stay ahead of illness.</p>
+      </div>
+    </div>
+
+    <div class="bys-ft-line"></div>
+
+    <div class="bys-ft-cols">
+      <div class="bys-ft-col bys-ft-touch">
+        <h5>Get In Touch</h5>
+        <ul>
+          <li><i class="bi bi-envelope"></i><a href="mailto:support@shrigodahealthcare.com">support@shrigodahealthcare.com</a></li>
+          <li><i class="bi bi-telephone"></i><a href="https://wa.me/919830024236">+91 98300 24236</a></li>
+          <li><i class="bi bi-geo-alt"></i><span>203, Shivam Square, 4 Sahar Road, Andheri (E), Mumbai 400069, Maharashtra, India</span></li>
+        </ul>
+      </div>
+      <div class="bys-ft-col">
+        <h5>Quick Links</h5>
+        <ul>
+          <li><a href="../doctor/find-doctor.html">Find a Doctor</a></li>
+          <li><a href="../lab-tests/index.html">Diagnostic Lab Tests</a></li>
+          <li><a href="../medicines/index.html">Medicines Delivery</a></li>
+          <li><a href="../dental/index.html">Dental Care</a></li>
+          <li><a href="../fitness/index.html">Cult.fit Fitness</a></li>
+          <li><a href="../shop/shop.html">Shop</a></li>
+        </ul>
+      </div>
+      <div class="bys-ft-col">
+        <h5>Services</h5>
+        <ul>
+          <li><a href="../doctor/find-doctor.html">Teleconsultation</a></li>
+          <li><a href="../lab-tests/index.html">Diagnostic Labs</a></li>
+          <li><a href="../medicines/index.html">Medicine Delivery</a></li>
+          <li><a href="../dental/index.html">Dental Care Plans</a></li>
+          <li><a href="../fitness/index.html">Cult.fit Pass</a></li>
+          <li><a href="../index.html#services">All Services</a></li>
+        </ul>
+      </div>
+      <div class="bys-ft-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="../index.html#services">Services</a></li>
+          <li><a href="../index.html#how-it-works">How It Works</a></li>
+          <li><a href="../index.html#faq">FAQ</a></li>
+          <li><a href="../index.html#contact">Contact</a></li>
+          <li><a href="https://teleconsult.bysure.in/patient/mind-gym">Mind Gym</a></li>
+        </ul>
+      </div>
+      <div class="bys-ft-col">
+        <h5>Account</h5>
+        <ul>
+          <li><a href="https://teleconsult.bysure.in/login">Log in</a></li>
+          <li><a href="https://teleconsult.bysure.in/register">Register</a></li>
+          <li><a href="cart.html">Basket</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bys-ft-bottom">
+      <nav aria-label="Footer">
+        <a href="../index.html#services">Services</a>
+        <a href="../index.html#how-it-works">How It Works</a>
+        <a href="../index.html#faq">FAQ</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+      <p>© <span id="year">2026</span> BeyondSure. All rights reserved.</p>
+    </div>
+  </footer>
+</main>
+
+<button class="bys-to-top" id="toTop" type="button" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+
+<!-- toast for "added to cart" -->
+<div class="dp-toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="../assets/js/products-data.js"></script>
+<script src="../assets/js/cart.js"></script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+================================================================================
+BEYONDSURE HEALTHCARE ECOSYSTEM – COMPLETE SERVICES FLOW DOCUMENTATION
+================================================================================
+Project: BeyondSure (by Shrigoda Healthcare)
+Document Version: 1.0
+Created: 2026-11-19
+Author: Antigravity AI Engineering
+
+TABLE OF CONTENTS:
+1. Architectural Overview & Design System
+2. Service 1: Diagnostic Lab Tests & Health Packages (lab-tests/)
+3. Service 2: Online Pharmacy & Medicine Delivery (medicines/)
+4. Service 3: Dental Care & Clinic Network (dental/)
+5. Service 4: Cult.fit Gym & Fitness Membership (fitness/)
+6. Cross-Service Shared Infrastructure (services-core.js)
+7. Navigation & Footer Integration Guide
+8. Reference Benchmark Mapping
+
+================================================================================
+1. ARCHITECTURAL OVERVIEW & DESIGN SYSTEM
+================================================================================
+BeyondSure provides an integrated, patient-first preventive healthcare web
+ecosystem. The architecture is engineered using high-performance Vanilla
+JavaScript (ES6+ modular IIFE patterns), Bootstrap 5.3.3, and custom CSS
+(assets/css/style.css).
+
+Key Design Language & CSS Namespaces:
+- .bys-*  : Core brand elements (Header, Topbar, Footer, Buttons, Marquees)
+- .fd-*   : Doctor discovery & directory styling
+- .dp-*   : Doctor profile & single-doctor scheduling
+- .sp-*   : Wellness store cards & listing
+- .pd-*   : Product details, gallery & tabs
+- .ct-*   : Shopping cart & GST financial calculations
+- .sv-*   : Universal service vertical styling (cards, steppers, date strips,
+            time slots, tracking timelines, digital QR cards)
+
+================================================================================
+2. SERVICE 1: DIAGNOSTIC LAB TESTS & HEALTH PACKAGES (lab-tests/)
+================================================================================
+Industry References: Tata 1mg, Apollo 24/7, Dr Lal Pathlabs, MediBhai
+
+DIRECTORY STRUCTURE:
+lab-tests/
+├── index.html            --> Package discovery, health concern filters & pincode validator
+├── book.html             --> 3-step home collection scheduling wizard
+└── confirmation.html     --> Real-time order ID, tracking timeline & phlebotomist badge
+
+DETAILED FLOW & USER JOURNEY:
+Step 1: Explore & Filter (index.html)
+- Users browse popular health checkup packages (e.g., Comprehensive Full Body
+  Checkup 64 tests, Senior Citizen Profile 78 tests, Diabetes & Heart Profile,
+  Vitamin D3/B12 Duo, Thyroid Total).
+- Users can filter packages by Health Concern (Full Body, Diabetes, Vitamins,
+  Thyroid, Women's Care) or search tests in real-time.
+- Instant Pincode Checker: Users enter their 6-digit Indian pincode to confirm
+  doorstep sample pickup serviceability.
+- Add to Cart: Users click "Book Test" which updates the sticky bottom cart bar.
+
+Step 2: Scheduling & Patient Info (book.html)
+- Step 2.1: Patient Details (Full Name, Age, Gender, WhatsApp Mobile, Email).
+- Step 2.2: Home Address (Pincode, City, Flat/Street, Landmark) and Date strip
+  picker (next 7 days).
+- Step 2.3: Slot Selection (Morning fasting slots 6:30 AM – 10:30 AM vs evening
+  non-fasting slots) and Payment Mode selection (Pay at Collection vs Prepay).
+- Stepper validation ensures zero invalid submissions.
+
+Step 3: Confirmation & Tracking (confirmation.html)
+- Generates unique Booking ID (e.g. LAB-892104).
+- Phlebotomist Card: Displays assigned certified collector (Suresh Kumar),
+  safety certifications, and daily temperature clearance (98.4°F).
+- Doorstep Check-in QR: Procedural SVG QR code for authentication at doorstep.
+- Live 5-stage tracking timeline (Booked -> Collector Assigned -> Sample Picked
+  Up -> NABL Processing -> Digital Report Ready).
+- Pre-test fasting preparation checklist.
+
+================================================================================
+3. SERVICE 2: ONLINE PHARMACY & MEDICINE DELIVERY (medicines/)
+================================================================================
+Industry References: PharmEasy, Tata 1mg, Apollo 24/7
+
+DIRECTORY STRUCTURE:
+medicines/
+├── index.html            --> Prescription upload dropzone, medicine catalog & search
+├── checkout.html         --> Prescription review, delivery address & speed selector
+└── confirmation.html     --> Order tracking, pharmacist license badge & ETA
+
+DETAILED FLOW & USER JOURNEY:
+Step 1: Browse & Upload Prescription (index.html)
+- Order With Prescription Box: Drag-and-drop or file upload for JPG, PNG, or PDF
+  doctor prescriptions. Prescriptions are cached in browser localStorage.
+- Search by brand or active salt name (e.g. Metformin, Telmisartan, Pantoprazole,
+  Dolo 650, Limcee Vitamin C, Shelcal Calcium, Livnora Syrup).
+- Categorized chips filter: Diabetes, Cardiac, Digestive, Pain Relief, Vitamins,
+  and Ayurvedic.
+- Items feature clear Rx-Required vs. OTC badges and manufacturer details.
+- Add to Basket updates the sticky checkout bar.
+
+Step 2: Prescription Verification & Checkout (checkout.html)
+- Step 2.1: Review attached prescription file and enter recipient contact.
+- Step 2.2: Delivery Address with 6-digit pincode validation.
+- Step 2.3: Delivery Speed Selection:
+  * Standard Delivery (24–48 Hours) -> FREE
+  * Express 2-Hour Delivery (Available in metros) -> +₹49
+- Payment Options: Cash on Delivery (COD) vs Online Prepaid (UPI/Cards).
+
+Step 3: Order Confirmation & Live Tracking (confirmation.html)
+- Displays Order ID (e.g. MED-718290) and estimated delivery date/time.
+- Dispensing Pharmacist Badge: Displays the reviewing pharmacist's name,
+  credentials, and state license number (e.g. Dr. Arvind Kulkarni, MH-PH-89120B).
+- Delivery Verification QR: Tamper-proof security QR code for delivery rider.
+- Tracking Timeline: Received -> Pharmacist Verified -> Packed -> Out for Delivery
+  -> Delivered.
+- Medicine storage and safety guidelines.
+
+================================================================================
+4. SERVICE 3: DENTAL CARE & CLINIC NETWORK (dental/)
+================================================================================
+Industry References: Clove Dental, HealthAssure, MediBhai
+
+DIRECTORY STRUCTURE:
+dental/
+├── index.html            --> Treatments catalog, dental health plans & clinic locator
+├── book.html             --> Treatment selection, clinic branch & slot scheduler
+└── confirmation.html     --> Digital dental voucher, chair reservation pass & map links
+
+DETAILED FLOW & USER JOURNEY:
+Step 1: Explore Treatments & Dental Plans (index.html)
+- Dental Treatments: Doctor Consultation & RVG X-Ray, Ultrasonic Scaling &
+  Polishing, Pain-Free Root Canal (RCT), Laser Teeth Whitening, Clear Aligners,
+  Zirconia Dental Crowns.
+- BeyondSure Annual Dental Health Plans:
+  * Individual Smile Plan (₹999/yr): 2 Free cleanings, unlimited consultations,
+    20% off all procedures.
+  * Family Dental Shield (₹1,999/yr): 4 Family members, free pediatric checks,
+    25% off RCT & crowns.
+  * SmileAlign Pro Package (₹29,999 or EMI): Free 3D intraoral scan.
+- 500+ Partner Clinics locator covering Mumbai, Pune, Delhi NCR, and Bengaluru.
+
+Step 2: Clinic & Slot Reservation (book.html)
+- Step 2.1: Procedure selection and City & Clinic Branch picker.
+- Step 2.2: Patient info and optional dental symptoms / pain notes.
+- Step 2.3: Preferred appointment date strip and time slot (Morning, Afternoon,
+  or Evening clinic slots).
+- Payment Mode: Pay at Clinic with Zero Advance vs Prepay Online with Extra 10%
+  Savings.
+
+Step 3: Appointment Confirmation & Clinic Pass (confirmation.html)
+- Pass ID (e.g. DEN-921840) with guaranteed zero-waiting chair reservation.
+- Clinic Details: Clinic name, address, Google Maps link, and front-desk phone.
+- Digital Chair Check-in QR code for instant reception verification.
+- Pre-visit dental preparation guidelines (oral hygiene, past X-rays, medications).
+- Direct WhatsApp clinic desk button for rescheduling.
+
+================================================================================
+5. SERVICE 4: CULT.FIT GYM & FITNESS MEMBERSHIP (fitness/)
+================================================================================
+Industry References: Cult.fit, Ekincare, HealthAssure
+
+DIRECTORY STRUCTURE:
+fitness/
+├── index.html            --> Multi-center access overview, signature workout formats
+├── join.html             --> Pass tier selector, duration picker & activation
+└── pass.html             --> Premium digital membership card with turnstile QR code
+
+DETAILED FLOW & USER JOURNEY:
+Step 1: Membership Overview & Formats (index.html)
+- Signature Workout Formats: Boxing & Combat, Yoga & Mobility, HRX Strength,
+  Dance Fitness / Zumba, Functional Strength & Conditioning, Open Gym.
+- Membership Tiers:
+  * Cult ELITE Pass: Unlimited access to ALL Cult centers nationwide, group
+    workouts, partner gyms, and at-home live classes.
+  * Cult PRO Pass: Unlimited access to 500+ partner gym floors.
+  * Cult LIVE: Daily interactive video fitness streaming.
+- Multi-city roaming and free pause allowance (up to 45 days).
+
+Step 2: Plan Duration & Profile (join.html)
+- Step 2.1: Choose Pass Tier and Duration (1 Month, 3 Months, 6 Months,
+  12 Months) with live dynamic price recalculation.
+- Step 2.2: Member Profile (Name, Mobile, Email, Fitness Goal, Primary City).
+- Step 2.3: Activation Date (Start Today vs Start Next Monday) and Payment
+  Option (One-time vs No-Cost EMI).
+
+Step 3: Digital Membership Pass (pass.html)
+- Digital Member ID Card (.sv-idcard): Displays member name, active tier,
+  validity duration, and procedural turnstile check-in SVG QR code.
+- Included Privileges: 500+ Gyms, Group Workouts, 45 Days Free Pause, Locker
+  & Shower access.
+- Center operating hours (6:00 AM – 10:00 PM) and etiquette guidelines.
+- Print pass button.
+
+================================================================================
+6. CROSS-SERVICE SHARED INFRASTRUCTURE (services-core.js)
+================================================================================
+The entire service suite is powered by the unified utility engine:
+assets/js/services-core.js (window.BS_SVC).
+
+Core Modules:
+- BS_SVC.makeCart(key): Isolated client-side carts for each vertical:
+  * bs_lab_cart
+  * bs_med_cart
+- BS_SVC.orders: Persistent booking repository in localStorage ('bs_svc_orders'):
+  * orders.save(service, data) -> returns prefixed ID (e.g. LAB..., MED..., DEN...)
+  * orders.get(id)
+  * orders.update(id, patch)
+  * orders.list(service)
+- BS_SVC.valid & checkFields(container): Client-side input validation
+  (Indian mobile, 6-digit pincode, age, email, required text).
+- BS_SVC.dateStrip(n, offset, selectedIdx): Generates interactive horizontal
+  date buttons with day names, dates, and months.
+- BS_SVC.slotButtons(slots, selected): Renders accessible time slot buttons.
+- BS_SVC.stepper(root, options): Manages multi-step wizard navigation, step
+  indicator pills, and step validation gates.
+- BS_SVC.timeline(steps, doneIndex): Renders responsive progress tracking
+  timelines with checkmark dots.
+- BS_SVC.qrSvg(seed, size): Generates procedural, scalable inline SVG QR codes
+  derived deterministically from order and pass IDs.
+- BS_SVC.toast(msg): Non-blocking floating toast notifications.
+- BS_SVC.initSite(): Binds sticky headers, mobile offcanvas menus, back-to-top
+  buttons, marquee tickers, and AOS animations.
+
+================================================================================
+7. NAVIGATION & FOOTER INTEGRATION GUIDE
+================================================================================
+Every page across the entire BeyondSure website maintains consistent, fully
+working cross-links:
+
+Main Menu Navigation:
+- Find a Doctor  --> find-doctor.html
+- Shop           --> shop.html
+- Lab Tests      --> lab-tests/index.html
+- Medicines      --> medicines/index.html
+- Dental         --> dental/index.html
+- Fitness        --> fitness/index.html
+- Services       --> index.html#services
+
+Footer Columns:
+- Column 1: Get In Touch (Email, WhatsApp, Andheri East Mumbai address)
+- Column 2: Quick Links (Find Doctor, Shop, Lab Tests, Medicines, Dental, Fitness)
+- Column 3: Our Services (Teleconsultation, Diagnostic Lab Tests, Medicine Delivery,
+            Dental Care Plans, Cult.fit Membership, Travel Insurance)
+- Column 4: Company (Services, How It Works, FAQ, Contact, Mind Gym)
+- Column 5: Account (Log in, Register, Wellness Basket)
+
+================================================================================
+8. REFERENCE BENCHMARK MAPPING
+================================================================================
+- Tata 1mg / Apollo 24/7   --> Diagnostic health packages, fasting notes, NABL labs
+- PharmEasy                --> Prescription upload dropzone, Scheduled H compliance
+- Clove Dental             --> 500+ clinic network, transparent pricing, dental plans
+- Cult.fit                 --> All-access fitness pass, workout formats, pause policy
+- MediBhai / HealthAssure  --> Cashless corporate health passes & wellness habits
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

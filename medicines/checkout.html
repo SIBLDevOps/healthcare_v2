@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Medicine Checkout &amp; Prescription Verification – BeyondSure</title>
+  <meta name="description" content="Checkout and verify delivery address for your online medicine order with registered pharmacist review.">
+  <meta name="theme-color" content="#1964ee">
+
+  <link rel="icon" href="https://teleconsult.bysure.in/favicon.ico?v=4">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://teleconsult.bysure.in/favicon-32x32.png?v=4">
+  <link rel="apple-touch-icon" href="https://teleconsult.bysure.in/apple-touch-icon.png?v=4">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+
+<body class="sv-page">
+  <!-- Top Bar -->
+  <div class="bys-topbar d-none d-md-block">
+    <div class="bys-topbar-inner">
+      <p><i class="bi bi-heart-pulse"></i> Beyond Insurance. Into Wellness.</p>
+      <div class="bys-topbar-links">
+        <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i> support@shrigodahealthcare.com</a>
+        <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bys-site-header" id="siteHeader">
+    <div class="bys-header-inner">
+      <a class="bys-logo" href="../index.html" aria-label="BeyondSure home">
+        <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" width="146" height="40">
+      </a>
+
+      <nav class="bys-menu-pill" aria-label="Main">
+        <a href="../doctor/find-doctor.html">Find a Doctor</a>
+        <a href="../lab-tests/index.html">Lab Tests</a>
+        <a href="index.html" class="is-active">Medicines</a>
+        <a href="../dental/index.html">Dental</a>
+        <a href="../fitness/index.html">Cult Fitness</a>
+        <a href="../shop/shop.html">Shop</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+
+      <div class="bys-header-actions">
+        <a class="bys-icon-btn bys-cart-btn" href="../cart/cart.html" aria-label="Basket" data-cart-link><i class="bi bi-basket2"></i><span class="bys-cart-badge" data-cart-count hidden>0</span></a>
+        <a class="bys-login-link" href="https://teleconsult.bysure.in/login">Log in</a>
+        <a class="bys-btn-brand" href="https://teleconsult.bysure.in/register">Register</a>
+        <button class="bys-icon-btn bys-menu-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Open menu"><i class="bi bi-list"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Menu -->
+  <div class="offcanvas offcanvas-end bys-mobile-menu" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header">
+      <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" height="34" id="mobileMenuLabel">
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="bys-m-link" href="../doctor/find-doctor.html">Find a Doctor <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../lab-tests/index.html">Diagnostic Lab Tests <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link active" href="index.html">Medicines Delivery <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../dental/index.html">Dental Care &amp; Clinics <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../fitness/index.html">Cult.fit Fitness Pass <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../shop/shop.html">Shop <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../index.html#services">All Services <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../index.html#how-it-works">How It Works <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../index.html#contact">Contact <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="https://teleconsult.bysure.in/login">Log in <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-btn-brand w-100 mt-4" href="https://teleconsult.bysure.in/register">Register</a>
+      <div class="bys-m-contact">
+        <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i> support@shrigodahealthcare.com</a>
+        <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="bys-site-wrap" id="main">
+    <section class="fd-hero sv-subhero">
+      <div class="fd-hero-inner">
+        <div class="fd-hero-copy">
+          <nav class="fd-crumbs" aria-label="Breadcrumb">
+            <a href="../index.html">Home</a>
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            <a href="index.html">Online Pharmacy</a>
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            <span aria-current="page">Medicine Checkout</span>
+          </nav>
+          <h1 class="mt-2">Review Order &amp; Prescription</h1>
+          <p class="fd-lead">Verify your prescribed medicines, provide delivery address, and choose your preferred delivery speed.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="sv-wrap">
+      <div class="sv-layout" id="medCheckoutWizard">
+        <!-- Main Form Stepper -->
+        <div class="sv-main">
+          <ol class="sv-steps-bar" role="tablist">
+            <li class="is-current" data-step="0"><span>1</span> Prescription &amp; Items</li>
+            <li data-step="1"><span>2</span> Delivery Address</li>
+            <li data-step="2"><span>3</span> Delivery Speed &amp; Pay</li>
+          </ol>
+
+          <!-- Step 1: Prescription Verification & Line Items -->
+          <section class="sv-panel sv-step" data-step="0">
+            <h2><span class="dp-ic"><i class="bi bi-prescription2"></i></span> Prescription &amp; Medicines</h2>
+            <p>Our licensed pharmacists check every prescription item for dosage accuracy and interactions.</p>
+
+            <!-- Prescription Upload Section -->
+            <div class="p-3 border rounded-4 bg-light mt-3">
+              <h5 class="fw-bold mb-1"><i class="bi bi-file-earmark-arrow-up text-primary"></i> Prescription Document</h5>
+              <p class="small text-muted mb-2">Required for Scheduled H / H1 drugs (e.g. Blood pressure, anti-diabetics, antibiotics).</p>
+
+              <div id="rxStatusDisplay" class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-white border">
+                <div>
+                  <i class="bi bi-file-earmark-check text-success fs-5 me-2"></i>
+                  <span class="fw-bold" id="rxNameLabel">Prescription Attached</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="changeRxBtn">Change File</button>
+              </div>
+              <input type="file" id="rxReuploadInput" accept="image/*,.pdf" hidden>
+            </div>
+
+            <!-- Recipient details -->
+            <div class="sv-form-grid mt-4">
+              <div class="sv-field">
+                <label for="custName">Recipient Name *</label>
+                <input type="text" id="custName" class="sv-input" placeholder="e.g. Amit Verma" data-validate="name" required>
+                <small class="sv-err" hidden>Please enter recipient name</small>
+              </div>
+
+              <div class="sv-field">
+                <label for="custPhone">10-Digit Mobile (For Delivery Updates) *</label>
+                <input type="tel" id="custPhone" class="sv-input" placeholder="e.g. 9830024236" maxlength="10" data-validate="mobile" required>
+                <small class="sv-err" hidden>Enter a valid 10-digit Indian mobile number</small>
+              </div>
+            </div>
+
+            <div class="sv-panel-foot">
+              <a href="index.html" class="bys-btn-brand-outline">Back to Catalog</a>
+              <button type="button" class="bys-btn-brand" data-next>Continue to Address <i class="bi bi-arrow-right"></i></button>
+            </div>
+          </section>
+
+          <!-- Step 2: Delivery Address -->
+          <section class="sv-panel sv-step" data-step="1" hidden>
+            <h2><span class="dp-ic"><i class="bi bi-geo-alt"></i></span> Doorstep Delivery Address</h2>
+            <p>Medicines are dispatched in tamper-proof, sealed packaging from our licensed pharmacy hub.</p>
+
+            <div class="sv-form-grid mt-3">
+              <div class="sv-field">
+                <label for="delPin">Delivery Pincode *</label>
+                <input type="text" id="delPin" class="sv-input" placeholder="e.g. 400069" maxlength="6" data-validate="pincode" required>
+                <small class="sv-err" hidden>Enter a valid 6-digit Indian pincode</small>
+              </div>
+
+              <div class="sv-field">
+                <label for="delCity">City &amp; State *</label>
+                <input type="text" id="delCity" class="sv-input" placeholder="Mumbai, Maharashtra" data-validate="name" required>
+                <small class="sv-err" hidden>Enter delivery city</small>
+              </div>
+
+              <div class="sv-field is-wide">
+                <label for="delStreet">Complete Street Address (Flat / Wing / Society) *</label>
+                <textarea id="delStreet" class="sv-input" placeholder="e.g. 203, Shivam Square, 4 Sahar Road, Andheri East" data-validate="required" required></textarea>
+                <small class="sv-err" hidden>Please provide your complete address</small>
+              </div>
+
+              <div class="sv-field is-wide">
+                <label for="delLandmark">Nearest Landmark</label>
+                <input type="text" id="delLandmark" class="sv-input" placeholder="Opposite Metro Pillar 112">
+              </div>
+            </div>
+
+            <div class="sv-panel-foot">
+              <button type="button" class="bys-btn-brand-outline" data-prev>Back</button>
+              <button type="button" class="bys-btn-brand" data-next>Choose Delivery Speed <i class="bi bi-arrow-right"></i></button>
+            </div>
+          </section>
+
+          <!-- Step 3: Delivery Speed & Payment -->
+          <section class="sv-panel sv-step" data-step="2" hidden>
+            <h2><span class="dp-ic"><i class="bi bi-lightning-charge"></i></span> Delivery Speed</h2>
+            <p>Select how fast you need your medicines delivered:</p>
+
+            <div class="sv-options is-row mt-3">
+              <label class="sv-option">
+                <input type="radio" name="speedOption" value="Standard Delivery (24-48 Hours)" checked>
+                <span class="sv-radio"></span>
+                <div>
+                  <strong>Standard Delivery</strong>
+                  <small>Delivery in 24–48 Hours</small>
+                </div>
+                <span class="sv-opt-price text-success">FREE</span>
+              </label>
+
+              <label class="sv-option">
+                <input type="radio" name="speedOption" value="Express 2-Hour Delivery">
+                <span class="sv-radio"></span>
+                <div>
+                  <strong>Express Delivery</strong>
+                  <small>Doorstep in under 2 hours</small>
+                </div>
+                <span class="sv-opt-price">+₹49</span>
+              </label>
+            </div>
+
+            <h3 class="sv-h mt-4"><span class="dp-ic"><i class="bi bi-wallet2"></i></span> Payment Mode</h3>
+            <div class="sv-options is-row mt-2">
+              <label class="sv-option">
+                <input type="radio" name="medPayMode" value="Cash on Delivery (COD)" checked>
+                <span class="sv-radio"></span>
+                <div>
+                  <strong>Cash on Delivery (COD)</strong>
+                  <small>Pay cash / UPI on delivery</small>
+                </div>
+              </label>
+
+              <label class="sv-option">
+                <input type="radio" name="medPayMode" value="Online UPI / Cards">
+                <span class="sv-radio"></span>
+                <div>
+                  <strong>Prepaid (UPI / Cards)</strong>
+                  <small>Razorpay Instant Settlement</small>
+                </div>
+              </label>
+            </div>
+
+            <div class="sv-note is-blue mt-4">
+              <i class="bi bi-shield-check"></i>
+              <div><strong>Free Medicine Replacement Guarantee</strong><br>Damaged, broken, or incorrect medicines are replaced or refunded within 48 hours without questions.</div>
+            </div>
+
+            <div class="sv-panel-foot">
+              <button type="button" class="bys-btn-brand-outline" data-prev>Back</button>
+              <button type="button" class="bys-btn-brand" id="placeOrderBtn">Place Medicine Order <i class="bi bi-bag-check"></i></button>
+            </div>
+          </section>
+        </div>
+
+        <!-- Sidebar Summary -->
+        <aside class="sv-aside">
+          <div class="sv-panel sv-summary">
+            <h3>Cart Summary</h3>
+            <ul class="sv-summary-items" id="medSummaryItems"></ul>
+
+            <div class="mt-3">
+              <div class="d-flex justify-content-between py-1"><span>Items Count:</span><b id="medSumCount">0</b></div>
+              <div class="d-flex justify-content-between py-1"><span>Packaging &amp; Handling:</span><b class="text-success">FREE</b></div>
+              <div class="d-flex justify-content-between py-1"><span>Pharmacist Verification:</span><b class="text-success">FREE</b></div>
+              <hr class="my-2">
+              <div class="d-flex justify-content-between fs-5"><strong>Total Payable:</strong><strong class="text-primary" id="medSumTotal">₹0</strong></div>
+            </div>
+
+            <div class="sv-note is-green mt-3">
+              <i class="bi bi-patch-check"></i>
+              <div><strong>Pharmacist Verified</strong><br>An SMS invoice with pharmacist license details will be generated upon confirmation.</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="dp-toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <!-- Footer -->
+    <footer class="bys-site-footer">
+      <div class="ft-top">
+        <div class="bys-ft-brand">
+          <a href="../index.html" class="bys-ft-logo" aria-label="BeyondSure home">
+            <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure">
+          </a>
+          <p class="bys-ft-tagline">Preventive care, made a daily habit. Genuine medicines delivered directly to your doorstep with guaranteed savings.</p>
+        </div>
+      </div>
+      <div class="bys-ft-line"></div>
+      <div class="bys-ft-cols">
+        <div class="bys-ft-col bys-ft-touch">
+          <h5>Get In Touch</h5>
+          <ul>
+            <li><i class="bi bi-envelope"></i><a href="mailto:support@shrigodahealthcare.com">support@shrigodahealthcare.com</a></li>
+            <li><i class="bi bi-telephone"></i><a href="https://wa.me/919830024236">+91 98300 24236</a></li>
+            <li><i class="bi bi-geo-alt"></i><span>203, Shivam Square, 4 Sahar Road, Andheri (E), Mumbai 400069, Maharashtra, India</span></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="../doctor/find-doctor.html">Find a Doctor</a></li>
+            <li><a href="../lab-tests/index.html">Diagnostic Lab Tests</a></li>
+            <li><a href="index.html">Medicines Delivery</a></li>
+            <li><a href="../dental/index.html">Dental Care</a></li>
+            <li><a href="../fitness/index.html">Cult.fit Fitness</a></li>
+            <li><a href="../shop/shop.html">Shop</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="../doctor/find-doctor.html">Teleconsultation</a></li>
+            <li><a href="../lab-tests/index.html">Diagnostic Labs</a></li>
+            <li><a href="index.html">Medicine Delivery</a></li>
+            <li><a href="../dental/index.html">Dental Care Plans</a></li>
+            <li><a href="../fitness/index.html">Cult.fit Pass</a></li>
+            <li><a href="../index.html#services">All Services</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="../index.html#services">Services</a></li>
+            <li><a href="../index.html#how-it-works">How It Works</a></li>
+            <li><a href="../index.html#faq">FAQ</a></li>
+            <li><a href="../index.html#contact">Contact</a></li>
+            <li><a href="https://teleconsult.bysure.in/patient/mind-gym">Mind Gym</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Account</h5>
+          <ul>
+            <li><a href="https://teleconsult.bysure.in/login">Log in</a></li>
+            <li><a href="https://teleconsult.bysure.in/register">Register</a></li>
+            <li><a href="../cart/cart.html">Basket</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bys-ft-bottom">
+        <nav aria-label="Footer">
+          <a href="../index.html#services">Services</a>
+          <a href="../index.html#how-it-works">How It Works</a>
+          <a href="../index.html#faq">FAQ</a>
+          <a href="../index.html#contact">Contact</a>
+        </nav>
+        <p>© <span id="year">2026</span> BeyondSure. All rights reserved.</p>
+      </div>
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/services-core.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const { $, $$, inr, makeCart, orders, toast, checkFields, stepper, initSite, store } = window.BS_SVC;
+      initSite();
+
+      const MEDICINES = [
+        { id: 'metformin-500-glyciphage', name: 'Glyciphage 500mg Tablet (Metformin)', price: 48.50 },
+        { id: 'telmisartan-40-telma', name: 'Telma 40mg Tablet (Telmisartan)', price: 198.00 },
+        { id: 'pan-d-capsule', name: 'Pan-D Capsule (Pantoprazole + Domperidone)', price: 185.00 },
+        { id: 'dolo-650-paracetamol', name: 'Dolo 650mg Tablet (Paracetamol)', price: 31.00 },
+        { id: 'limcee-500-vitamin-c', name: 'Limcee 500mg Orange Chewable', price: 24.50 },
+        { id: 'shelcal-500-calcium', name: 'Shelcal 500 Tablet (Calcium)', price: 112.00 },
+        { id: 'livnora-liver-syrup-rx', name: 'Livnora Liver Wellness Syrup', price: 251.16 },
+        { id: 'volini-pain-relief-spray', name: 'Volini Joint Pain Relief Spray', price: 180.00 }
+      ];
+
+      const medCart = makeCart('bs_med_cart');
+      const cartItems = medCart.get();
+
+      // If empty, preload sample essential items for smooth checkout demo
+      if (Object.keys(cartItems).length === 0) {
+        medCart.set('pan-d-capsule', 1);
+        medCart.set('dolo-650-paracetamol', 1);
+      }
+
+      function renderCart() {
+        const items = medCart.get();
+        let total = 0, count = 0;
+        const listHtml = Object.entries(items).map(([id, qty]) => {
+          const item = MEDICINES.find((x) => x.id === id) || { name: 'Prescription Item', price: 120 };
+          total += item.price * qty;
+          count += qty;
+          return `<li><span>${qty} × ${item.name}</span><b>${inr(item.price * qty)}</b></li>`;
+        }).join('');
+
+        $('#medSummaryItems').innerHTML = listHtml;
+        $('#medSumCount').textContent = count;
+        $('#medSumTotal').textContent = inr(total);
+        return { total, count };
+      }
+      const totals = renderCart();
+
+      // Prescription management
+      const uploadedRx = store.get('bs_uploaded_rx', null);
+      if (uploadedRx) {
+        $('#rxNameLabel').textContent = `Prescription: ${uploadedRx}`;
+      } else {
+        $('#rxNameLabel').textContent = 'Sample Prescription: Dr_Consult_Rx_Mumbai.pdf';
+      }
+
+      const reuploadInput = $('#rxReuploadInput');
+      $('#changeRxBtn').addEventListener('click', () => reuploadInput.click());
+      reuploadInput.addEventListener('change', () => {
+        const f = reuploadInput.files[0];
+        if (f) {
+          $('#rxNameLabel').textContent = f.name;
+          store.set('bs_uploaded_rx', f.name);
+          toast('New prescription attached!');
+        }
+      });
+
+      // Stepper
+      const wizard = stepper($('#medCheckoutWizard'), {
+        validate: (idx) => {
+          const currentPanel = $$('.sv-step', $('#medCheckoutWizard'))[idx];
+          return checkFields(currentPanel);
+        }
+      });
+
+      // Confirm order
+      $('#placeOrderBtn').addEventListener('click', () => {
+        const orderData = {
+          recipientName: $('#custName').value.trim() || 'Amit Verma',
+          recipientMobile: $('#custPhone').value.trim() || '9830024236',
+          pincode: $('#delPin').value.trim() || '400069',
+          city: $('#delCity').value.trim() || 'Mumbai',
+          street: $('#delStreet').value.trim() || '203, Shivam Square, Sahar Road, Andheri East',
+          landmark: $('#delLandmark').value.trim(),
+          prescription: store.get('bs_uploaded_rx', 'Dr_Consult_Rx_Mumbai.pdf'),
+          deliverySpeed: $('input[name="speedOption"]:checked').value,
+          paymentMode: $('input[name="medPayMode"]:checked').value,
+          items: medCart.get(),
+          totalAmount: totals.total
+        };
+
+        const orderId = orders.save('medicines', orderData);
+        medCart.clear();
+        toast('Medicine order placed! Forwarding to tracking...');
+        setTimeout(() => {
+          window.location.href = `confirmation.html?id=${orderId}`;
+        }, 600);
+      });
+    })();
+  </script>
+</body>
+</html>

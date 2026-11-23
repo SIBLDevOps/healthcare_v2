@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find &amp; Book a Doctor – BeyondSure</title>
+  <meta name="description"
+    content="Find verified BeyondSure doctors by specialty, availability, fee, language and experience, and book a video consultation.">
+  <meta name="theme-color" content="#1964ee">
+
+  <!-- Favicons (BeyondSure live URLs) -->
+  <link rel="icon" href="https://teleconsult.bysure.in/favicon.ico?v=4">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://teleconsult.bysure.in/favicon-32x32.png?v=4">
+  <link rel="apple-touch-icon" href="https://teleconsult.bysure.in/apple-touch-icon.png?v=4">
+
+  <!-- Fonts: Figtree (BeyondSure brand) + Plus Jakarta Sans (headings) -->
+  <!-- Early connections to the servers this page loads from (faster first load) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://teleconsult.bysure.in">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+
+  <!-- Bootstrap 5 + Bootstrap Icons + AOS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+
+  <!-- Site styles (shared by all pages) -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .fd-hero-inner {
+      padding: 120px 48px 30px;
+    }
+
+    @media screen and (max-width: 767.98px) {
+      .fd-trust {
+        text-align: left;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 8px 14px;
+      }
+
+      .fd-hero-inner {
+        padding: 96px 16px 28px;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body class="bys-page-find-doctor">
+
+  <!-- =====================================================================
+     TOP BAR
+     ===================================================================== -->
+  <div class="bys-topbar d-none d-md-block">
+    <div class="bys-topbar-inner">
+      <p><i class="bi bi-heart-pulse"></i> Beyond Insurance. Into Wellness.</p>
+      <div class="bys-topbar-links">
+        <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i>
+          support@shrigodahealthcare.com</a>
+        <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+     HEADER
+     ===================================================================== -->
+  <header class="bys-site-header" id="siteHeader">
+    <div class="bys-header-inner">
+      <a class="bys-logo" href="../index.html" aria-label="BeyondSure home">
+        <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" width="146"
+          height="40">
+      </a>
+
+      <nav class="bys-menu-pill" aria-label="Main">
+        <a href="find-doctor.html" class="is-active" aria-current="page">Find a Doctor</a>
+        <a href="../lab-tests/index.html">Lab Tests</a>
+        <a href="../medicines/index.html">Medicines</a>
+        <a href="../dental/index.html">Dental</a>
+        <a href="../fitness/index.html">Cult Fitness</a>
+        <a href="../shop/shop.html">Shop</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+
+      <div class="bys-header-actions">
+        <a class="bys-icon-btn" href="../cart/cart.html" aria-label="Basket, empty"><i class="bi bi-basket2"></i></a>
+        <a class="bys-login-link" href="https://teleconsult.bysure.in/login">Log in</a>
+        <a class="bys-btn-brand" href="https://teleconsult.bysure.in/register">Register</a>
+        <button class="bys-icon-btn bys-menu-toggle" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Open menu"><i
+            class="bi bi-list"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="offcanvas offcanvas-end bys-mobile-menu" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header">
+      <img src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure" height="34"
+        id="mobileMenuLabel">
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <a class="bys-m-link fd-active-link" href="find-doctor.html" aria-current="page">Find a Doctor <i
+          class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../lab-tests/index.html">Diagnostic Lab Tests <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../medicines/index.html">Medicines Delivery <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../dental/index.html">Dental Care & Clinics <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../fitness/index.html">Cult.fit Fitness Pass <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../shop/shop.html">Shop <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../index.html#services">All Services <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../index.html#how-it-works">How It Works <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="../index.html#contact">Contact <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-m-link" href="https://teleconsult.bysure.in/login">Log in <i class="bi bi-chevron-right"></i></a>
+      <a class="bys-btn-brand w-100 mt-4" href="https://teleconsult.bysure.in/register">Register</a>
+      <div class="bys-m-contact">
+        <a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i>
+          support@shrigodahealthcare.com</a>
+        <a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="bys-site-wrap" id="main">
+
+    <!-- =================================================================
+       HERO + SEARCH
+       ================================================================= -->
+    <section class="fd-hero" aria-labelledby="fdTitle">
+      <span class="fd-plus bys-p1" aria-hidden="true">+</span>
+      <span class="fd-plus bys-p2" aria-hidden="true">+</span>
+      <span class="fd-orb bys-o1" aria-hidden="true"></span>
+      <span class="fd-orb bys-o2" aria-hidden="true"></span>
+
+      <div class="fd-hero-inner">
+        <div class="fd-hero-copy">
+          <nav class="fd-crumbs" aria-label="Breadcrumb" data-aos="fade-up">
+            <a href="../index.html">Home</a>
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            <span aria-current="page">Find a Doctor</span>
+          </nav>
+
+          <h1 id="fdTitle" data-aos="fade-up" data-aos-delay="60">Find &amp; Book The Right Doctor</h1>
+          <p class="fd-lead" data-aos="fade-up" data-aos-delay="120">Browse verified specialists, check their next
+            available slot and book a video consultation in minutes.</p>
+
+          <!-- search panel -->
+          <form class="fd-search" id="heroSearch" role="search" data-aos="fade-up" data-aos-delay="180">
+            <div class="fd-field">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              <label class="visually-hidden" for="qInput">Doctor name or specialty</label>
+              <input type="search" id="qInput" placeholder="Doctor name or specialty" autocomplete="off">
+            </div>
+            <span class="fd-field-sep" aria-hidden="true"></span>
+            <div class="fd-field fd-field-select">
+              <i class="bi bi-heart-pulse" aria-hidden="true"></i>
+              <label class="visually-hidden" for="specSelect">Specialty</label>
+              <select id="specSelect">
+                <option value="">All specialties</option>
+              </select>
+            </div>
+            <button type="submit" class="bys-btn-brand fd-search-btn"><i class="bi bi-search"></i><span>Find
+                Doctors</span></button>
+          </form>
+
+          <ul class="fd-trust" data-aos="fade-up" data-aos-delay="240">
+            <li><i class="bi bi-patch-check-fill"></i> Verified doctors</li>
+            <li><i class="bi bi-camera-video-fill"></i> Video consultation</li>
+            <li><i class="bi bi-file-earmark-medical-fill"></i> e-Prescription as PDF</li>
+            <li><i class="bi bi-shield-fill-check"></i> Secure payments</li>
+          </ul>
+        </div>
+
+        <!-- Hero image (responsive) -->
+        <div class="fd-hero-media" data-aos="fade-up" data-aos-delay="200">
+          <img src="../assets/images/find-doctor-hero.png" sizes="(max-width: 991.98px) 380px, 440px"
+            alt="BeyondSure app on a phone showing the Find a Doctor screen with available doctors and booking slots"
+            width="1212" height="1297" decoding="async" fetchpriority="high">
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+       LISTING
+       ================================================================= -->
+    <section class="fd-body" id="results" aria-label="Doctor results">
+      <div class="fd-layout">
+
+        <!-- ---------- Filters: sidebar on desktop, right drawer on tablet, bottom sheet on mobile ---------- -->
+        <aside class="offcanvas-lg offcanvas-bottom fd-filters" tabindex="-1" id="fdFilters"
+          aria-labelledby="fdFiltersTitle">
+          <div class="fd-sheet-handle d-md-none" aria-hidden="true"></div>
+          <div class="offcanvas-header d-lg-none">
+            <h2 class="fd-f-title">Filters</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#fdFilters"
+              aria-label="Close filters"></button>
+          </div>
+
+          <div class="offcanvas-body">
+            <div class="fd-f-card" id="filterForm">
+              <div class="fd-f-head">
+                <h2 class="fd-f-title" id="fdFiltersTitle"><i class="bi bi-funnel"></i> Filters</h2>
+                <button type="button" class="fd-reset" data-reset>Reset</button>
+              </div>
+
+              <!-- Availability -->
+              <fieldset class="fd-f-group">
+                <legend>Availability</legend>
+                <div class="fd-seg" role="radiogroup" aria-label="Availability">
+                  <label><input type="radio" name="avail" value="" checked><span>Any time</span></label>
+                  <label><input type="radio" name="avail" value="today"><span>Today</span></label>
+                  <label><input type="radio" name="avail" value="tomorrow"><span>Tomorrow</span></label>
+                </div>
+              </fieldset>
+
+              <!-- Specialization -->
+              <fieldset class="fd-f-group">
+                <legend>Specialization <span class="fd-sel-count" id="specCount" hidden></span></legend>
+                <div class="fd-mini-search">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                  <label class="visually-hidden" for="specFind">Find a specialization</label>
+                  <input type="text" id="specFind" placeholder="Find specialization" autocomplete="off">
+                </div>
+                <div class="fd-checklist" id="specList"></div>
+              </fieldset>
+
+              <!-- Consultation fee -->
+              <fieldset class="fd-f-group">
+                <legend>Consultation fee</legend>
+                <div class="fd-range">
+                  <div class="fd-range-top"><span>Up to</span><strong id="feeOut">₹2,000</strong></div>
+                  <label class="visually-hidden" for="feeRange">Maximum consultation fee</label>
+                  <input type="range" id="feeRange" min="200" max="2000" step="50" value="2000">
+                  <div class="fd-range-scale"><span>₹200</span><span>₹2,000</span></div>
+                </div>
+              </fieldset>
+
+              <!-- Language -->
+              <fieldset class="fd-f-group">
+                <legend>Language <span class="fd-sel-count" id="langCount" hidden></span></legend>
+                <div class="fd-mini-search">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                  <label class="visually-hidden" for="langFind">Find a language</label>
+                  <input type="text" id="langFind" placeholder="Find language (e.g. Tamil, हिन्दी)" autocomplete="off">
+                </div>
+                <!-- filled from LANGUAGES in find-doctor.js -->
+                <div class="fd-checklist fd-langlist" id="langList"></div>
+              </fieldset>
+
+              <!-- Experience -->
+              <fieldset class="fd-f-group">
+                <legend>Experience</legend>
+                <div class="fd-pills">
+                  <label><input type="radio" name="exp" value="0" checked><span>Any</span></label>
+                  <label><input type="radio" name="exp" value="5"><span>5+ yrs</span></label>
+                  <label><input type="radio" name="exp" value="10"><span>10+ yrs</span></label>
+                  <label><input type="radio" name="exp" value="15"><span>15+ yrs</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="fd-sheet-foot d-lg-none">
+              <button type="button" class="bys-btn-brand-outline" data-reset>Reset</button>
+              <button type="button" class="bys-btn-brand" data-bs-dismiss="offcanvas" data-bs-target="#fdFilters">Show
+                <span id="sheetCount">0 doctors</span></button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ---------- Results ---------- -->
+        <div class="fd-results">
+          <div class="fd-bar">
+            <div class="fd-bar-left">
+              <h2 class="fd-count" id="resultCount" aria-live="polite">0 doctors found</h2>
+              <p class="fd-sub" id="resultSub">Showing all specialties</p>
+            </div>
+            <div class="fd-bar-right">
+              <button class="fd-filter-btn d-lg-none" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#fdFilters" aria-controls="fdFilters">
+                <i class="bi bi-funnel"></i> Filters <span class="fd-badge" id="filterBadge" hidden>0</span>
+              </button>
+              <div class="fd-sort">
+                <label for="sortSelect">Sort</label>
+                <select id="sortSelect">
+                  <option value="relevance">Relevance</option>
+                  <option value="available">Next available</option>
+                  <option value="fee-asc">Fee: low to high</option>
+                  <option value="fee-desc">Fee: high to low</option>
+                  <option value="experience">Most experienced</option>
+                </select>
+              </div>
+              <div class="fd-view" role="group" aria-label="Layout">
+                <button type="button" data-view="list" aria-pressed="true" aria-label="List view"><i
+                    class="bi bi-view-list"></i></button>
+                <button type="button" data-view="grid" aria-pressed="false" aria-label="Grid view"><i
+                    class="bi bi-grid"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="fd-tags" id="activeTags" aria-live="polite"></div>
+
+          <div class="fd-list" id="doctorList" data-view="list"></div>
+
+          <div class="fd-empty" id="emptyState" hidden>
+            <span class="fd-empty-ico"><i class="bi bi-person-video2"></i></span>
+            <h3>No doctors match these filters</h3>
+            <p>Try a different specialty, a higher fee limit or any availability.</p>
+            <button type="button" class="bys-btn-brand" data-reset>Reset filters</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+       MARQUEE BAND
+       ================================================================= -->
+    <div class="bys-band bys-section" aria-hidden="true">
+      <div class="bys-marquee-track" data-marquee="Preventive Care|Made A Daily Habit|Beyond Insurance|Into Wellness">
+      </div>
+    </div>
+
+    <!-- =================================================================
+       FOOTER
+       ================================================================= -->
+    <footer class="bys-site-footer">
+      <div class="ft-top">
+        <div class="bys-ft-brand">
+          <a href="../index.html" class="bys-ft-logo" aria-label="BeyondSure home"><img
+              src="https://teleconsult.bysure.in/images/beyondsure-logo_light.png" alt="BeyondSure"></a>
+          <p class="bys-ft-tagline">Preventive care, made a daily habit. Talk to certified doctors on video, get digital
+            prescriptions, and stay ahead of illness.</p>
+        </div>
+      </div>
+
+      <div class="bys-ft-line"></div>
+
+      <div class="bys-ft-cols">
+        <div class="bys-ft-col bys-ft-touch">
+          <h5>Get In Touch</h5>
+          <ul>
+            <li><i class="bi bi-envelope"></i><a
+                href="mailto:support@shrigodahealthcare.com">support@shrigodahealthcare.com</a></li>
+            <li><i class="bi bi-telephone"></i><a href="https://wa.me/919830024236">+91 98300 24236</a></li>
+            <li><i class="bi bi-geo-alt"></i><span>203, Shivam Square, 4 Sahar Road, Andheri (E), Mumbai 400069,
+                Maharashtra, India</span></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="find-doctor.html">Find a Doctor</a></li>
+            <li><a href="../lab-tests/index.html">Diagnostic Lab Tests</a></li>
+            <li><a href="../medicines/index.html">Medicines Delivery</a></li>
+            <li><a href="../dental/index.html">Dental Care</a></li>
+            <li><a href="../fitness/index.html">Cult.fit Fitness</a></li>
+            <li><a href="../shop/shop.html">Shop</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="find-doctor.html">Teleconsultation</a></li>
+            <li><a href="../lab-tests/index.html">Diagnostic Labs</a></li>
+            <li><a href="../medicines/index.html">Medicine Delivery</a></li>
+            <li><a href="../dental/index.html">Dental Care Plans</a></li>
+            <li><a href="../fitness/index.html">Cult.fit Pass</a></li>
+            <li><a href="../index.html#services">All Services</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="../index.html#services">Services</a></li>
+            <li><a href="../index.html#how-it-works">How It Works</a></li>
+            <li><a href="../index.html#faq">FAQ</a></li>
+            <li><a href="../index.html#contact">Contact</a></li>
+            <li><a href="https://teleconsult.bysure.in/patient/mind-gym">Mind Gym</a></li>
+          </ul>
+        </div>
+        <div class="bys-ft-col">
+          <h5>Account</h5>
+          <ul>
+            <li><a href="https://teleconsult.bysure.in/login">Log in</a></li>
+            <li><a href="https://teleconsult.bysure.in/register">Register</a></li>
+            <li><a href="../cart/cart.html">Basket</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bys-ft-bottom">
+        <nav aria-label="Footer">
+          <a href="../index.html#services">Services</a>
+          <a href="../index.html#how-it-works">How It Works</a>
+          <a href="../index.html#faq">FAQ</a>
+          <a href="../index.html#contact">Contact</a>
+        </nav>
+        <p>© <span id="year">2026</span> BeyondSure. All rights reserved.</p>
+      </div>
+    </footer>
+  </main>
+
+  <button class="bys-to-top" id="toTop" type="button" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="../assets/js/doctors-data.js"></script>
+  <script src="../assets/js/dropdown.js"></script>
+  <script src="../assets/js/find-doctor.js"></script>
+</body>
+
+</html>
