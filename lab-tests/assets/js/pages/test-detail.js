@@ -41,7 +41,7 @@
         <section class="lt-card mt-4"><div class="lt-card-title"><h2><i class="bi bi-shield-check"></i> Home collection &amp; safety process</h2></div>
           <div class="lt-safety"><div><i class="bi bi-person-badge"></i><b>Certified technician</b><small>Background-verified</small></div><div><i class="bi bi-box-seam"></i><b>Sealed single-use kit</b><small>Opened in front of you</small></div><div><i class="bi bi-thermometer-snow"></i><b>Cold-chain transport</b><small>Sample stays stable</small></div><div><i class="bi bi-file-earmark-lock"></i><b>Secure digital report</b><small>OTP-protected sharing</small></div></div></section>
         <section class="mt-4"><div class="lt-section-head"><h2 class="h4">Often booked with</h2></div><div class="lt-grid">${t.related.map((r) => testCard(r)).join('')}</div></section>`;
-      side.innerHTML = `<div class="lt-card lt-pricecard"><small class="fw-bold">Price at labs near ${esc(s.location.pincode)}</small>
+      side.innerHTML = `<div class="lt-card lt-pricecard">${LT.ui.cardLab(t.id)}<small class="fw-bold">Price at labs near ${esc(s.location.pincode)}</small>
           <div class="mt-1">${priceBlock(t.fromPrice, t.mrp, { from: true })}</div>
           <p class="small mt-2 mb-3"><i class="bi bi-info-circle text-primary"></i> Price varies by lab: <b class="lt-ink">${money(t.priceRange.min)} - ${money(t.priceRange.max)}</b> across ${t.labCount} lab${t.labCount === 1 ? '' : 's'}.</p>
           <div class="lt-pc-acts">${addBtn(t.id, { block: true }).replace('btn lt-add', 'btn lt-add lt-btn-lg')}

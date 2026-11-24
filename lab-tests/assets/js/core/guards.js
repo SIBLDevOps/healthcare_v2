@@ -13,7 +13,7 @@ window.LT = window.LT || {};
     location: [(s) => s.location.pincode && s.mode && served(s), 'index.html?setup=location', 'Please choose a location we serve (Pune or Mumbai) and how you\'d like to get tested.'],
     cart: [(s) => s.cart.length > 0, 'cart.html', 'Your lab cart is empty. Add tests to continue.'],
     members: [(s) => s.user.loggedIn && s.selectedMemberIds.length > 0 && s.cart.every((c) => s.selectedMemberIds.some((m) => (s.assignments[m] || []).includes(c.id))), 'cart.html', 'Please choose a family member for every test in your cart.'],
-    lab: [(s) => !!s.lab.id, 'select-lab.html', 'Please select a lab.'],
+    lab: [(s) => !!s.lab.id, 'compare-labs.html', 'Please select a lab.'],
     place: [(s) => (s.mode === 'home' ? !!s.address.id : !!s.lab.centreId), 'location.html', 'Please confirm the collection address or lab centre.'],
     slot: [(s) => !!s.slot.start, 'slot.html', 'Please choose a date and time slot.']
   };

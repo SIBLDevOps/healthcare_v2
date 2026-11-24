@@ -2,7 +2,7 @@
    Lives in LT.store().cart as [{ id, type, source, sources[], requestId }] and
    LT.store().assignments as { memberId: [itemId] } – every test belongs to one or more
    family members. selectedMemberIds = members that have at least one test.
-   LT.cart.add / setMembers / removeFor / remove / restore / has / list / count / clear / merge. */
+   LT.cart.add / setMembers / toggleMember / setAssignments / removeFor / remove / restore / has / list / count / clear / merge. */
 window.LT = window.LT || {};
 
 (function () {
@@ -17,8 +17,13 @@ window.LT = window.LT || {};
     const sel = s.selectedMemberIds.filter((m) => a[m]).concat((extraOrder || Object.keys(a)).filter((m) => a[m] && !s.selectedMemberIds.includes(m)));
     LT.store.set({ assignments: a, selectedMemberIds: [...new Set(sel)] });
   }
-  /* any change in who gets what clears the chosen lab + slot (price/slot length change) */
-  const resetLab = () => { const s = LT.store.get(); if (s.lab.id || s.slot.start) LT.store.set({ lab: Object.assign(s.lab, { id: null, method: null, centreId: null }), slot: LT.store.defaults().slot }); };
+  /* any change in who gets what clears the slot (slot length changes). The lab chosen for the booking
+     (lab side-bar on the first test) stays – it is changed on the Compare labs page – and is only
+     cleared when the cart becomes empty, so the next first test asks for a lab again. */
+  const resetLab = () => {
+    const s = LT.store.get(), empty = !get().length;
+    if ((empty && s.lab.id) || s.slot.start) LT.store.set({ lab: empty ? Object.assign(s.lab, { id: null, method: null, centreId: null }) : s.lab, slot: LT.store.defaults().slot });
+  };
 
   LT.cart = {
     list: get,
@@ -47,6 +52,17 @@ window.LT = window.LT || {};
       memberIds.forEach((m) => { a[m] = (a[m] || []).concat(id); });
       writeAssign(a, memberIds); resetLab();
     },
+    /* Lab Cart member chips: add / remove one member for one item. The item stays in the cart even when
+       nobody is ticked (the cart then asks who it is for). */
+    toggleMember(id, memberId, on) {
+      if (!LT.cart.has(id)) return;
+      const a = LT.store.get().assignments || {};
+      a[memberId] = (a[memberId] || []).filter((x) => x !== id);
+      if (on) a[memberId].push(id);
+      writeAssign(a, on ? [memberId] : null); resetLab();
+    },
+    /* replace all assignments at once (Undo on the Lab Cart page) */
+    setAssignments(a) { writeAssign(JSON.parse(JSON.stringify(a || {}))); resetLab(); },
     /* remove a test for one member only; drops it from the cart when nobody has it */
     removeFor(id, memberId) {
       const item = get().find((c) => c.id === id);

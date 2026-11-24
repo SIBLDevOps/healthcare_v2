@@ -57,6 +57,12 @@
     return { sort: g('sort') || 'popularity', filters: { fasting: g('fasting') || 'any', tat: g('tat') || 'any', priceMax: +$('#ltPrice').value, availability: g('availability') || 'any' } };
   }
   $('[data-filters]').innerHTML = filtersHtml();
+  /* phones / tablets: the Sort & Filter bottom sheet lives inside the page content, which sits in its own layer
+     (.lt-main > * { z-index: 1 }). While the sheet is open that layer is lifted (body.lt-filter-open, lab.css) so the
+     sheet shows above the header and the mobile bottom app menu instead of behind them. */
+  const sheet = $('#ltFilters');
+  sheet.addEventListener('show.bs.offcanvas', () => document.body.classList.add('lt-filter-open'));
+  sheet.addEventListener('hidden.bs.offcanvas', () => document.body.classList.remove('lt-filter-open'));
   $('[data-filters]').addEventListener('input', async (e) => {
     if (e.target.name === 'priceMax') $('[data-pv]').textContent = money(e.target.value);
     const f = readFilters();

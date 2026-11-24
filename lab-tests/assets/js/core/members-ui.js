@@ -1,8 +1,9 @@
-/* Lab Tests – "Select Member" step, used every time a test or package is added.
-   LT.members.pick(itemId, { source, requestId }) -> login (if needed) -> Select Member popup
-       (Self + family members, add member inline). Resolves the chosen member ids, or null.
-   LT.members.addFor(memberId) -> search popup to add a test for one member only.
+/* Lab Tests – family members.
+   LT.members.quickAdd(itemId, { source, requestId }) -> login (if needed) -> item added to the lab cart for Self
+       (no popup; who gets each test is chosen on the Lab Cart page).
+   LT.members.checks(itemId, members) -> { memberId: { blocked, issue, level } } gender / age rules.
    LT.members.form(member?)    -> add / edit family member form. Resolves the saved member or null.
+   LT.members.manage()         -> Family Members popup (profile menu).
    LT.members.color(id)        -> avatar colour for a member. */
 window.LT = window.LT || {};
 
@@ -24,138 +25,29 @@ window.LT = window.LT || {};
     return out;
   }
 
-  /* ---------- Select Member popup ---------- */
-  let picking = false; // ignore a second click while the popup is already open
-  async function pick(id, o) {
-    if (picking) return null;
-    picking = true;
-    try { return await pickInner(id, o); } finally { picking = false; }
-  }
-  async function pickInner(id, o) {
+  /* ---------- Add from a test / package card (no popup) ----------
+     login (if needed) -> the item goes into the lab cart for "Self". Who gets each test (Self, family members)
+     is chosen on the Lab Cart page. If the test is not suitable for Self (e.g. a men-only test) it is added
+     without a member and the cart asks who it is for. Resolves { added, memberId } or null (login closed). */
+  let adding = false;
+  async function quickAdd(id, o) {
     o = o || {};
-    if (!LT.store.get().user.loggedIn) {
-      try { await U().authModal({ reason: 'Log in to add tests and choose who each test is for.' }); } catch (e) { return null; }
-      LT.layout.refreshHeader();
-    }
-    const it = LT.pricing.item(id);
-    if (!it) return null;
-    let members;
-    try { members = await LT.api.getMembers(); } catch (e) { U().toast(U().errMsg(e), 'danger'); return null; }
-    const inCart = LT.cart.has(id) && LT.cart.membersOf(id).length > 0;
-    let chosen = inCart ? LT.cart.membersOf(id) : (o.preset || []).slice();
-    if (!inCart && !chosen.length) { const self = members.find((m) => m.relationship === 'Self'); if (self) chosen = [self.id]; }
-    chosen = chosen.filter((m) => members.some((x) => x.id === m));
-    return open();
-
-    function open() {
-      return new Promise((resolve) => {
-        let result = null, next = null;
-        const v = checks(id, members);
-        chosen = chosen.filter((m) => !v[m] || !v[m].blocked);
-        const fresh = members.length <= 1;
-        const otherInBooking = LT.store.get().selectedMemberIds.filter((m) => !LT.cart.membersOf(id).includes(m));
-        const chosenLabel = () => chosen.length + ' selected';
-        const row = (m) => {
-          const c = v[m.id], on = chosen.includes(m.id);
-          return `<label class="lt-pick-row ${c.blocked ? 'is-blocked' : ''}"><input type="checkbox" class="lt-pick-input" value="${m.id}" ${on ? 'checked' : ''} ${c.blocked ? 'disabled' : ''} aria-label="${esc(m.name)}, ${esc(m.relationship)}">
-            <span class="lt-pick-card"><span class="lt-pick-tick"><i class="bi bi-check-lg"></i></span>${U().avatar(m.name, color(m.id))}
-              <span class="lt-pick-body"><b>${esc(m.name)}${m.relationship === 'Self' ? ' <span class="lt-pill is-primary">You</span>' : ''}</b><small>${meta(m)}</small>
-                ${c.issue ? `<span class="lt-pick-note is-${c.level}"><i class="bi bi-${c.blocked ? 'slash-circle' : 'exclamation-triangle'}"></i> ${esc(c.issue)}</span>` : ''}
-                ${m.incomplete ? `<button type="button" class="lt-linkbtn lt-pick-edit" data-edit="${m.id}"><i class="bi bi-pencil"></i> Complete profile</button>` : ''}</span></span></label>`;
-        };
-        const md = U().modal.open({
-          title: 'Select Member', sub: 'Who is this test for? You can choose more than one person.',
-          body: `<div class="lt-pick-item"><span class="lt-pick-ico"><i class="bi bi-${it.type === 'package' || LT.pricing.isPackage(id) ? 'box2-heart' : 'eyedropper'}"></i></span>
-              <div class="flex-grow-1"><b>${esc(it.name)}</b><small>${LT.pricing.isPackage(id) ? (it.tests || []).length + ' tests' : esc(it.sampleType || 'Blood')} · ${it.fastingHours ? it.fastingHours + ' hrs fasting' : 'No fasting'}</small></div>
-              <span class="lt-pick-price"><small>From</small><b>${U().money(LT.api.fromPrice(id))}</b><small>per person</small></span></div>
-            <p class="lt-pick-label">Choose member${members.length > 1 ? 's' : ''} <span>${chosenLabel()}</span></p>
-            <div class="lt-pick-list" role="group" aria-label="Family members">${members.map(row).join('')}
-              <button type="button" class="lt-pick-add" data-addm ${members.length >= MAX_SAVED ? 'disabled' : ''}><i class="bi bi-person-plus"></i><span><b>Add family member</b><small>${fresh ? 'Parents, spouse or kids' : members.length + ' of ' + MAX_SAVED + ' saved'}</small></span></button></div>
-            ${fresh ? '<div class="lt-pick-tip"><i class="bi bi-people"></i><span>Booking for your family too? Add them once and choose them for any test.</span></div>' : ''}
-            <p class="lt-pick-hint"><i class="bi bi-info-circle"></i> Up to ${MAX_SEL} members per booking. Each person gets a separate report.</p>`,
-          footer: `${inCart ? '<button type="button" class="btn lt-btn-ghost text-danger me-auto" data-rm><i class="bi bi-trash"></i> Remove test</button>' : ''}<button type="button" class="btn lt-btn-outline" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn lt-btn" data-ok></button>`,
-          onClose: () => { if (next) next(); else resolve(result); }
-        });
-        md.el.classList.add('lt-pick-modal');
-        const okBtn = md.$('[data-ok]');
-        const paint = () => {
-          md.$('.lt-pick-label span').textContent = chosenLabel();
-          okBtn.disabled = !chosen.length;
-          okBtn.innerHTML = !chosen.length ? 'Select a member' : (inCart ? 'Save' : '<i class="bi bi-plus-lg"></i> Add') + (chosen.length > 1 ? ' for ' + chosen.length + ' members' : ' for ' + esc(first((members.find((m) => m.id === chosen[0]) || {}).name)));
-        };
-        md.el.addEventListener('change', (e) => {
-          const x = e.target.closest('.lt-pick-input'); if (!x) return;
-          if (x.checked) {
-            if (new Set(otherInBooking.concat(chosen, x.value)).size > MAX_SEL) { x.checked = false; return U().toast('A booking can have up to ' + MAX_SEL + ' members', 'warning'); }
-            chosen.push(x.value);
-          } else chosen = chosen.filter((m) => m !== x.value);
-          paint();
-        });
-        md.el.addEventListener('click', (e) => {
-          const ed = e.target.closest('[data-edit]');
-          if (ed) { e.preventDefault(); const m = members.find((x) => x.id === ed.dataset.edit); next = () => form(m).then(() => reload().then(() => open().then(resolve))); md.close(); return; }
-          if (e.target.closest('[data-addm]')) { next = () => form().then((saved) => reload().then(() => { if (saved && !chosen.includes(saved.id)) chosen.push(saved.id); return open().then(resolve); })); md.close(); return; }
-          if (e.target.closest('[data-rm]')) { const removed = LT.cart.remove(id); result = []; U().toast(it.name + ' removed', 'info', { action: 'Undo', onAction: () => { LT.cart.restore(removed); LT.layout.refresh(); o.onChange && o.onChange(); } }); md.close(); o.onChange && o.onChange(); }
-        });
-        okBtn.onclick = async () => {
-          if (!chosen.length) return;
-          LT.cart.setMembers(id, chosen, o.source || (LT.pricing.isPackage(id) ? 'package' : 'manual'), o.requestId);
-          result = chosen.slice();
-          md.close();
-          const names = chosen.map((m) => first((members.find((x) => x.id === m) || {}).name));
-          U().toast((it.short || it.name) + (inCart ? ' updated for ' : ' added for ') + names.join(', '));
-          await overlap(id, chosen, members);
-          o.onChange && o.onChange();
-        };
-        paint();
-      });
-    }
-    async function reload() { members = await LT.api.getMembers(); }
-  }
-
-  /* package <-> single test overlap for the same member */
-  async function overlap(id, chosen, members) {
-    const a = LT.store.get().assignments || {}, P = LT.pricing;
-    const pairs = [];
-    chosen.forEach((m) => {
-      const mine = a[m] || [];
-      if (P.isPackage(id)) mine.filter((x) => !P.isPackage(x) && P.item(id).tests.includes(x)).forEach((t) => pairs.push({ m, test: t, pkg: id }));
-      else mine.filter((x) => P.isPackage(x) && P.item(x).tests.includes(id)).forEach((p) => pairs.push({ m, test: id, pkg: p }));
-    });
-    if (!pairs.length) return;
-    const nm = (m) => first((members.find((x) => x.id === m) || {}).name);
-    const yes = await U().confirm({
-      title: 'Already in a package', icon: 'files',
-      body: `<p>${pairs.map((p) => `<b>${esc(P.item(p.test).short || P.item(p.test).name)}</b> is already inside <b>${esc(P.item(p.pkg).name)}</b> for ${esc(nm(p.m))}.`).join('<br>')}</p><p class="text-muted mb-0">Remove the separate test to avoid paying twice?</p>`, ok: 'Yes, remove', cancel: 'Keep both'
-    });
-    if (yes) { pairs.forEach((p) => LT.cart.removeFor(p.test, p.m)); U().toast('Duplicate tests removed'); }
-  }
-
-  /* ---------- add a test for one member (search popup) ---------- */
-  function addFor(memberId, onChange) {
-    return LT.api.getMembers().then((members) => new Promise((resolve) => {
-      const m = members.find((x) => x.id === memberId); if (!m) return resolve(null);
-      const md = U().modal.open({
-        title: 'Add a test for ' + esc(first(m.name)), sub: 'Only ' + esc(first(m.name)) + ' gets these tests. Others are not charged.',
-        body: '<div class="lt-searchbox" style="box-shadow:none"><i class="bi bi-search"></i><label class="visually-hidden" for="afq">Search tests</label><input id="afq" type="search" placeholder="Search e.g. Thyroid, Vitamin D, Lipid" autocomplete="off"></div><div class="mt-3" data-r></div>',
-        onOpen: (el) => el.querySelector('#afq').focus(), onClose: () => resolve(true)
-      });
-      const run = async () => {
-        const r = await LT.api.searchTests({ q: md.$('#afq').value, pageSize: 10 });
-        md.$('[data-r]').innerHTML = r.items.map((t) => {
-          const has = (LT.store.get().assignments[memberId] || []).includes(t.id), c = checks(t.id, [m])[m.id];
-          return `<div class="lt-ocr-row"><span class="flex-grow-1"><b class="lt-ink">${esc(t.name)}</b><small class="d-block">From ${U().money(t.fromPrice)} · ${t.fastingHours ? t.fastingHours + ' hrs fasting' : 'No fasting'}</small>${c.blocked ? `<small class="d-block text-danger">${esc(c.issue)}</small>` : ''}</span>${has ? '<span class="lt-pill is-success"><i class="bi bi-check2"></i>Added</span>' : c.blocked ? '' : `<button type="button" class="btn lt-add lt-btn-sm" data-pick="${t.id}"><i class="bi bi-plus-lg"></i> Add</button>`}</div>`;
-        }).join('') || '<p class="small">No tests found.</p>';
-      };
-      md.$('[data-r]').onclick = async (e) => {
-        const b = e.target.closest('[data-pick]'); if (!b) return;
-        LT.cart.add(b.dataset.pick, 'manual', null, { members: [memberId] });
-        U().toast((LT.pricing.item(b.dataset.pick) || {}).short + ' added for ' + first(m.name));
-        await overlap(b.dataset.pick, [memberId], members);
-        onChange && onChange(); run();
-      };
-      md.$('#afq').addEventListener('input', U().debounce(run, 250)); run();
-    }));
+    if (adding) return null;
+    adding = true;
+    try {
+      if (!LT.store.get().user.loggedIn) {
+        try { await U().authModal({ reason: 'Log in to add tests. You can book for your family in the lab cart.' }); } catch (e) { return null; }
+        LT.layout.refreshHeader();
+      }
+      const it = LT.pricing.item(id); if (!it) return null;
+      let members = [];
+      try { members = await LT.api.getMembers(); } catch (e) { members = []; }
+      const self = members.find((m) => m.relationship === 'Self');
+      const ok = self && !self.incomplete ? !checks(id, [self])[self.id].blocked : !!self;
+      const source = o.source || (LT.pricing.isPackage(id) ? 'package' : 'manual');
+      LT.cart.add(id, source, o.requestId || null, ok ? { members: [self.id] } : null);
+      return { added: true, memberId: ok ? self.id : null, member: ok ? self : null, item: it };
+    } finally { adding = false; }
   }
 
   /* ---------- add / edit family member form ---------- */
@@ -253,5 +145,5 @@ window.LT = window.LT || {};
     } catch (e) { await U().confirm({ title: 'Cannot remove ' + esc(m.name), icon: 'exclamation-octagon', danger: true, body: `<p class="mb-0">${esc(U().errMsg(e))}</p>`, ok: 'OK', cancel: false }); }
   }
 
-  LT.members = { pick, addFor, form, manage, color, gender, MAX_SEL };
+  LT.members = { quickAdd, checks, form, manage, color, gender, MAX_SEL, MAX_SAVED };
 })();

@@ -22,12 +22,15 @@
           <h1>Booking Confirmed</h1><p class="mt-2">${b.mode === 'home' ? 'A technician will visit you' : 'See you at the centre'} on <b class="text-white">${esc(LT.ui.fmtSlot(b))}</b>.</p>
           <div class="d-flex flex-wrap justify-content-center gap-2 mt-3"><span class="lt-idchip"><i class="bi bi-hash"></i>${esc(b.id)}</span><button type="button" class="btn lt-btn-glass btn-sm" data-copy><i class="bi bi-copy"></i> Copy</button></div></section>
         <div class="row g-4 mt-1"><div class="col-lg-8">
-          <section class="lt-card"><div class="lt-card-title"><h2><i class="bi bi-people"></i> Members &amp; tests</h2></div>${b.membersView.map((m) => `<div class="d-flex gap-3 py-2 border-top align-items-start">${avatar(m.name, null, 'sm')}<div class="flex-grow-1"><b class="lt-ink">${esc(m.name)}</b> <small>${esc(m.relationship)}</small><div class="small">${m.tests.map((t) => esc(t.name)).join(' · ')}</div></div><b class="lt-ink">${money(m.subtotal)}</b></div>`).join('')}</section>
+          <section class="lt-card"><div class="lt-card-title"><h2><i class="bi bi-people"></i> Members &amp; tests</h2></div>${b.membersView.map((m) => `<div class="d-flex gap-3 py-2 border-top align-items-start">${avatar(m.name, null, 'sm')}<div class="flex-grow-1"><b class="lt-ink">${esc(m.name)}</b> <small>${esc(m.relationship)}</small><div class="small">${m.tests.map((t) => esc(t.name)).join(', ')}</div></div><b class="lt-ink">${money(m.subtotal)}</b></div>`).join('')}</section>
           <section class="lt-card"><div class="lt-card-title"><h2><i class="bi bi-clipboard2-pulse"></i> Before your test</h2></div>
-            <ul class="lt-checklist">${fasting ? `<li><i class="bi bi-cup-hot text-warning"></i><span><b>Fast for ${fasting}-12 hours</b> before the slot. Only plain water is allowed.</span></li>` : '<li><i class="bi bi-check-circle-fill"></i>No fasting needed for your tests.</li>'}
-              <li><i class="bi bi-person-vcard"></i>Keep ready: a photo ID for each member and the original prescription (if any).</li>
+            <ul class="lt-checklist">${fasting ? `
+                <li><i class="bi bi-cup-hot text-warning"></i><span><b>Fast for ${fasting}-12 hours</b> before the slot. Only plain water is allowed.</span></li>` : '<li><i class="bi bi-check-circle-fill"></i>No fasting needed for your tests.</li>'}
+                <li><i class="bi bi-person-vcard"></i>Keep ready: a photo ID for each member and the original prescription (if any).</li>
               ${b.mode === 'home' ? '<li><i class="bi bi-clock"></i>Technician arrival window: ' + esc(LT.ui.fmtSlot(b).split(', ').slice(-1)[0]) + '. You will get their name and phone 2 hours before.</li>' : '<li><i class="bi bi-geo-alt"></i>Reach the centre 10 minutes early and show the booking QR at reception.</li>'}
-              <li><i class="bi bi-telephone"></i>Need help? Call <a class="fw-bold text-primary" href="tel:+919830024236">+91 98300 24236</a> (7 AM - 10 PM).</li></ul></section>
+                <li class="flex-wrap"><i class="bi bi-telephone"></i>Need help? Call <a class="fw-bold text-primary" href="tel:+919830024236">+91 98300 24236</a> (7 AM - 10 PM).</li>
+              </ul>
+            </section>
         </div><div class="col-lg-4">
           <section class="lt-card"><div class="d-flex gap-3 align-items-center">${labLogo(b.lab, 'sm')}<div><b class="lt-ink">${esc(b.lab.name)}</b><div class="small">${esc(b.lab.phone)}</div></div></div>
             <dl class="lt-kv mt-3"><div><dt>Slot</dt><dd>${esc(LT.ui.fmtSlot(b))}</dd></div><div><dt>${b.mode === 'home' ? 'Address' : 'Centre'}</dt><dd>${b.mode === 'home' && b.address ? esc(b.address.house + ', ' + b.address.area) : b.centre ? esc(b.centre.name) : '-'}</dd></div>

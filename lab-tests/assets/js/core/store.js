@@ -2,7 +2,7 @@
    LT.store : booking-flow state in localStorage "lt_state_v2"
               { get(), set(patch), reset(), subscribe(fn), clearBooking() }
    LT.db    : seeded "tables" (members, addresses, bookings, requests, reports,
-              labApplications, labBookings, customLabs, reviews) in "lt_db_v1".
+              customLabs, reviews) in "lt_db_v2".
               Only the mock API (api.js) should touch LT.db. */
 window.LT = window.LT || {};
 
@@ -22,7 +22,6 @@ window.LT = window.LT || {};
     selectedMemberIds: [],
     assignments: {},                             // { memberId: [itemId] }
     lab: { id: null, method: null, centreId: null, preference: 'value' },
-    labOption: null,                             // last used option on select-lab: "choose" | "auto"
     address: { id: null },
     slot: { date: '', start: '', end: '', heldUntil: null },
     coupon: { code: null },
@@ -60,7 +59,7 @@ window.LT = window.LT || {};
       const d = LT.data || {};
       db = clone({
         members: d.members || [], addresses: d.addresses || [], bookings: d.bookings || [], requests: d.requests || [],
-        reports: d.reports || [], labApplications: d.labApplications || [], labBookings: d.labBookings || [],
+        reports: d.reports || [],
         labsStatus: {}, customLabs: [], reviews: [], notify: []
       });
       write(DB_KEY, db);

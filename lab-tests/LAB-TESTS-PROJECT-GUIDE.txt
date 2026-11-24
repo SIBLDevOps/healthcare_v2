@@ -26,10 +26,10 @@ TABLE OF CONTENTS
 11.  Login and Register
 12.  Prescription upload flow
 13.  Booking status timeline (after booking)
-14.  Lab partner and Admin pages (platform demo)
+14.  Lab partner and Admin pages (removed)
 15.  Where data is stored + demo data list
 16.  Test checklist for QA (ready-to-use scenarios)
-17.  Mobile bottom app menu (index.html)
+17.  Mobile bottom app menu (every page)
 18.  How to make it live (connect a real backend)
 19.  Known limits and assumptions
 20.  Glossary (simple meaning of words used)
@@ -128,7 +128,7 @@ lab-tests/
 |-- prescription-upload.html    Upload a doctor's prescription
 |-- my-requests.html            "My Prescription Requests" (status of uploads)
 |-- cart.html                   Lab Cart - tests grouped by family member
-|-- select-lab.html             Choose a partner lab (compare, sort, filter)
+|-- compare-labs.html           Compare labs = the "Lab" step (same tests at every lab, Select & Continue)
 |-- location.html               Choose home address (or confirm lab centre)
 |-- slot.html                   Choose date and time slot
 |-- summary.html                Review order, coupon, bill and payment
@@ -137,9 +137,6 @@ lab-tests/
 |-- appointment-detail.html?id= One booking: tracking, reschedule, cancel, feedback, support
 |-- reports.html                My Reports (list)
 |-- report-view.html?id=...     One report
-|-- lab-partner/register.html   Lab partner registration (platform demo)
-|-- lab-partner/dashboard.html  Lab partner dashboard (platform demo)
-|-- admin/lab-approvals.html    Admin approves new labs (platform demo)
 |-- README.md                   Short technical readme
 |-- LAB-TESTS-PROJECT-GUIDE.txt This document
 |
@@ -151,7 +148,10 @@ lab-tests/
 |     pricing.js      Price, bill, discounts, coupons
 |     matching.js     Which lab can do which test; gender/age rules for members
 |     cart.js         Add / remove tests, which member gets which test
-|     members-ui.js   "Select Member" popup, Add/Edit member form, Family Members popup
+|     members-ui.js   Add to cart for Self (quickAdd), gender/age checks, Add/Edit member form,
+|                     Family Members popup
+|     lab-picker.js   Lab side-bar after Add on the first test (labs + prices),
+|                     and the shared "Select & Continue" (partial-lab popup, centre choice)
 |     ui.js           Common UI parts: popups, toasts, login popup, cards, money format...
 |     layout.js       Header, footer, step bar, cart bar, Demo tools, global clicks
 |     guards.js       Stops users from skipping steps (redirects to the right page)
@@ -160,7 +160,7 @@ lab-tests/
 |     cities.js       Cities, areas, pincodes, which pincodes are served
 |     tests.js        All tests (price, fasting, report time, home/centre)
 |     packages.js     Health packages
-|     labs.js         Partner labs and their centres
+|     labs.js         Partner labs, their centres and tests they do NOT offer
 |     members.js      Demo family members
 |     addresses.js    Demo saved addresses
 |     slots.js        Time slots generator
@@ -169,7 +169,6 @@ lab-tests/
 |     reports.js      Demo reports
 |     requests.js     Demo prescription requests
 |     ocr.js          Sample prescription reading data (not used in the live flow)
-|     lab-portal.js   Data for lab partner / admin demo pages
 |
 |-- assets/js/pages/            One script per page (index.js for index.html, etc.)
 
@@ -202,7 +201,7 @@ own script in assets/js/pages/.
   - LT.db (inside store.js) keeps "server-side" demo records: members, addresses,
     bookings, reports, requests, labs status.
   - guards.js makes sure the order of steps is followed. Example: if someone opens
-    slot.html without choosing a lab, they are sent to select-lab.html with a message.
+    slot.html without choosing a lab, they are sent to compare-labs.html with a message.
   - All global objects start with "LT." (Lab Tests) so they never clash with the main site.
 
 
@@ -233,16 +232,30 @@ FLOW CHART (main booking journey)
         +-- Not logged in --> [Login / Register popup] (OTP)
         |
         v
-  [Select Member popup] -- tick who the test is for (Self / family / add new member)
-        |
+  [Added to the lab cart for Self] -- no member popup; a toast offers "View cart"
+        |                               (a men-only / women-only test is added without a member)
         v
-  [Lab Cart] -- tests grouped per person, fix warnings, add more tests
-        |
+  [Lab side-bar: "Choose a lab"] -- FIRST test only (no lab chosen yet): small cards with
+        |                           only the labs near you that do this test + price
+        |   "Select" -> the side-bar closes, you stay on the same page; every test
+        |   card shows the lab name (top-right). Later tests use this lab (no side-bar).
         v
-  [Select Lab] -- compare labs, sort, filter, pick one (or auto-assign)
-        |
+  [Lab cart] -> Continue
         v
-  [Location step] -- Home: pick saved address (same pincode)  /  Centre: confirm centre
+  [Compare labs page] -- top: your selected lab, "Tests & prices" drop-down
+        |                (every test, member names, price) + total
+        |              below: the same tests at other labs, each with its own
+        |                drop-down ("All 3 tests" / "2 of 3 tests")
+        |
+        +-- "Select & Continue" on a lab that misses tests
+        |      --> popup "This lab offers only 2 of your 3 tests":
+        |          Cancel = stay / Continue = remove the missing tests and go on
+        v
+  [Location step]
+        |
+        |   (Lab Cart is still there: header cart icon / cart bar -> "Continue" -> Compare labs)
+        v
+  Location step -- Home: pick saved address (same pincode)  /  Centre: confirm centre
         |
         v
   [Slot] -- pick date + 1-hour time window (slot is held for 10 minutes)
@@ -288,25 +301,76 @@ Step 3 - Find tests
 
 Step 4 - Add a test
   - Not logged in? The "Login to continue" popup opens first (Login / Register tabs).
-  - Then the "Select Member" popup: small cards (2 per row on desktop) for Self and family
-    members, plus "Add family member". Tick one or more people (max 6 per booking).
-  - Blocked members are disabled with the reason (example: PSA test is for men only).
-  - Members with an incomplete profile show "Complete profile".
-  - A test already in the cart re-opens the popup to change members or remove the test.
-  - If a package already contains the test, a "duplicate" prompt appears.
+  - There is NO member popup. The test goes straight into the lab cart for "Self" and a toast
+    says "CBC added for Riya. Book it for family members in your cart." (+ "View cart").
+  - If the test is not suitable for Self (e.g. PSA is for men only) it is added without a
+    member; the Lab Cart then asks who it is for.
+  - Tapping "Added" on a card removes the test again (toast with Undo).
+  - Family members are chosen on the Lab Cart page (see "Lab Cart" below).
+  - On the FIRST test the LAB SIDE-BAR opens (Step 5).
 
-Step 5 - Lab Cart
-  - Tests are grouped under each person (avatar, name, tests, subtotal).
-  - Per test: change members or remove. "Add test for <name>". Chips to book for other
-    family members or add a new one.
-  - Warnings: centre-only tests in home mode, duplicates per person, fasting needed.
-  - "Continue to Select Lab" is disabled until every test has a member.
+Step 5 - Lab side-bar "Choose a lab" (opens from the right; full screen on phones)
+  - Opens only for the FIRST test of a booking (when no lab is chosen yet). Later tests use
+    the chosen lab without asking; the lab is changed on the Compare labs page. The lab is
+    cleared when the cart becomes empty (or the mode changes / logout), so the next first
+    test asks again.
+  - The test at the top with who it is for ("For Riya, Karan" + Change).
+  - Every lab near the user as a SMALL card: logo, name, rating, price for THIS test
+    (MRP and % off) and a "Select" button. With 2+ members: "Rs.413 x 2 = Rs.826".
+    With more tests in the cart: "Cart here Rs.X" (+ "1 n/a" when a test is missing).
+    "Earlier lab" marks the lab chosen before.
+  - Sort: Recommended / Lowest price / Fastest report / Top rated (/ Nearest).
+  - Labs that do not do the test are NOT listed.
+  - Centre-only test in home mode: message + "Switch to Lab Centre" button.
+  - "Select" saves the lab and CLOSES the side-bar; the user stays on the same page.
+    A toast confirms it (with a "Compare labs" shortcut).
+  - Lab tag on test / package cards: once a lab is chosen, EVERY test and package card
+    (landing, search, packages, test detail price card) shows the lab name as a small green
+    tag on the card's top-right corner - your tests are done by that lab. A test the lab
+    does not do shows an amber "Not at <lab>" tag (and a warning toast if it is added:
+    "change the lab on the Compare labs page"). No lab chosen = no tags.
 
-Step 6 - Select Lab
-  - Lab cards with price, rating, report time, collection charge.
-  - Sort, filters, compare up to 3 labs, map/list view in centre mode, lab details drawer.
-  - If a lab cannot do every test, a "partial coverage" popup explains it.
-  - Changing the lab recalculates prices and clears the slot.
+Step 6 - Compare labs page (compare-labs.html = the "Lab" step in the step bar)
+  - Top: "Your selected lab" - the lab chosen in the side-bar when the first test was
+    added (a short note says so). Only when no lab was chosen: "Best match for your tests".
+      * "Tests & prices" drop-down (opens / closes like an FAQ; open on desktop, closed on
+        tablet and phone): every test with WHO it is for (member name chips, e.g.
+        "Riya" "Karan") and its price ("Rs.449 x 2" for two people).
+      * Footer row: total payable (MRP struck, "You save"), who it is for, and
+        "Select & Continue" (full width on phones).
+  - Below: "Compare with other labs" - one card per lab: "All 3 tests" or "2 of 3 tests"
+    badge, its own test drop-down (closed by default; the summary line already says e.g.
+    "Vitamin B12 not available"), total, and
+    "Rs.222 less / Rs.80 more than your lab" when both cover the same tests.
+  - Page head chips: location, mode, members and tests, "Add more tests", "Edit tests".
+  - Sort: Price (default) / Best match / Most tests / Fastest / Top rated (/ Nearest).
+    Filters: All tests available, NABL/CAP, Report within 24 h, Free collection.
+  - "Select & Continue" on a lab that misses tests opens a popup:
+      "This lab offers only 2 of your 3 tests" - Available here (with prices) /
+      Not available here. Cancel = stay on the Compare page. Continue = the missing tests
+      are removed from this booking and the user goes to the Location step.
+  - Centre visit + lab with 2+ centres: "Choose a centre" popup first.
+  - Changing the lab clears the slot.
+
+Lab Cart (cart.html) - still available any time
+  - Top: "Your selected lab" card - lab logo, name, rating, "All 3 tests" / "2 of 3 tests",
+    total at this lab, "You save", and a "Change lab" button (opens Compare labs). If the
+    lab misses a test, an amber note names it. No lab yet: "No lab selected yet" +
+    "Choose a lab".
+  - Step 1 "Who is this booking for?": an "Add member" card first, then Self and every
+    family member (avatar, name, relationship, age, "N tests" / "Tap to add"). Tap a member to
+    book ALL suitable tests for them (ticked card); tap again to remove them from the booking
+    (toast with Undo). Incomplete profiles ask for age & gender first. Max 6 members per
+    booking. On phones the member cards are one swipeable row. Logged out: "Log in" prompt.
+  - Step 2 "Tests in your cart": one card per test / package - name, sample, parameters,
+    fasting, report time, source chips, price ("From Rs.245 x 2"), remove (bin), and member
+    chips under "FOR" to choose exactly who gets it. Members the test is not suitable for
+    are greyed out with the reason (e.g. "PSA is only for men."). A test with nobody ticked
+    turns amber: "Choose who this test is for."
+  - Tests added before logging in are given to Self automatically the first time.
+  - Warnings: centre-only tests in home mode, duplicates per person (Fix now), similar
+    variants, fasting needed.
+  - "Continue" (to Compare labs) is disabled until every test has a member.
 
 Step 7 - Location step
   - Home Collection: saved addresses are shown ONLY if they match the chosen pincode.
@@ -316,15 +380,23 @@ Step 7 - Location step
 
 Step 8 - Slot (Select Collection Date & Time)
   - Header: "For <members> - <lab name>".
-  - 7 date pills (example FRI 20, SAT 21). The selected day shows "12 Slots".
+  - 7 date pills (example FRI 20, SAT 21). The selected day shows "13 Slots".
     Days with no slots show "Full".
-  - "MORNING SLOTS" with a "Fasting Recommended" badge when a test needs fasting.
-  - 12 one-hour windows: 05:30-06:30 AM, 06:00-07:00 AM ... 11:00 AM-12:00 PM.
+  - "MORNING SLOTS" (sun icon) with a "Fasting Recommended" badge when a test needs
+    fasting: 05:00-06:00 AM, 06:00-07:00 AM ... 11:00 AM-12:00 PM (7 windows).
+  - "AFTERNOON & EVENING" (moon icon): 12:00-01:00 PM, 01:00-02:00 PM, 02:00-03:00 PM,
+    04:00-05:00 PM, 05:00-06:00 PM, 06:00-07:00 PM (6 windows; no 3-4 PM slot).
+  - 13 one-hour windows a day, 2 per row on phones and 3 on desktop. Only one slot can be
+    selected across both groups. A group whose slots have all passed today says so.
   - Same-day slots need 2 hours notice (earlier ones are greyed out).
-  - "Confirm Slot (Sat, 21 Nov - 05:30 AM)" holds the slot for 10 minutes.
+  - "Confirm Slot (Tue, 24 Nov - 06:00 AM)" holds the slot for 10 minutes.
 
 Step 9 - Summary and Pay
-  - Part 1: members and tests, prescription, location, lab, slot, coupons, bill, consent.
+  - Part 1: members and tests, prescription, location, lab, slot, bill, consent.
+    Coupon: inside Bill details, right under "Taxes (diagnostics exempt)" - an "Enter coupon
+    code" box with Apply (Enter key works). Errors show under the box (empty / invalid /
+    expired / not applicable). Applied: green "CODE applied - You saved Rs.X" + Remove.
+    (The separate "Coupons & offers" card was removed.)
   - Part 2: payment method - UPI, Card, Net banking, Wallet, or Pay at collection/centre.
   - A countdown shows the slot hold time; if it expires, the user picks a slot again.
 
@@ -368,10 +440,13 @@ my-requests.html
   - Confirm -> tests go into the cart for that member.
 
 cart.html
-  - See Step 5 above.
+  - See "Lab Cart" in section 7. Continue goes to compare-labs.html.
 
-select-lab.html
-  - See Step 6 above.
+Lab side-bar (on every page with Add buttons: landing, search, test detail, packages...)
+  - See Step 5 above. Code: assets/js/core/lab-picker.js.
+
+compare-labs.html
+  - See Step 6 above. Code: assets/js/pages/compare-labs.js.
 
 location.html
   - See Step 7 above. Only addresses of the chosen pincode are shown. No live-location
@@ -392,8 +467,14 @@ appointments.html
 appointment-detail.html?id=
   - Header (booking ID, lab, call lab, support, invoice).
   - Tracking timeline (with technician card and ETA in home mode).
-  - Members and reports, preparation reminders, QR code + check-in (centre mode),
-    bill and payment.
+  - Members & reports: one open / close panel per family member (FAQ style; the first is
+    open). Closed it shows the name, relationship, number of tests, report date, how many
+    values are out of range and "Report ready" / "In progress" / "Cancelled". Open it lists
+    every test (parameters, sample, price) with its result chips (All normal / N out of
+    range / N borderline) and View (opens the PDF in a new tab) + PDF (download) - or
+    "Report expected by <date, time>" while it is being processed. Footer: tests total and
+    "Open full report" (report-view.html). On phones the buttons sit under the test name.
+  - Preparation reminders, QR code + check-in (centre mode), bill and payment.
   - Manage booking:
       * Reschedule  - same lab, maximum 2 times, closes 2 hours before the slot.
       * Remove a member - recalculates the bill, partial refund.
@@ -406,24 +487,34 @@ appointment-detail.html?id=
 
 reports.html / report-view.html?id=
   - Labs share every report as a PDF file (one PDF per test).
-  - reports.html: per family member, a list of  Report name | Lab & date | Result | View | Download.
-    "View" opens the PDF in a viewer popup (phones open it in their own PDF viewer);
-    "Download" saves the PDF (e.g. Riya_CBC_Report_20261115.pdf). Reports not ready yet show
-    "Track".
+  - reports.html: member tabs + summary strip, then one open / close panel per family member
+    (FAQ style, same as Compare labs / Appointment detail; the first is open, or the member
+    picked in the tabs). Closed: name, relationship, N reports, latest date, waiting count,
+    out-of-range count, "Reports ready" / "In progress". Open: every report PDF (name links to
+    report-view, parameters, lab, date, booking, result chips, "PDF - N pages") with View (new
+    tab) and PDF (download, e.g. Riya_CBC_Report_20261115.pdf); reports not ready yet show the
+    booking status and "Track".
   - report-view.html?id=...: all PDF files of one booking for one member, with View /
     Download / "Download all", a built-in PDF preview on desktop, the lab's summary, Share
     securely (OTP link), Consult a doctor and Book follow-up test.
   - Demo: the PDF is generated from sample data (core/report-pdf.js). In production the API
     returns the URL of the PDF uploaded by the lab (LT.api.getReportFile -> url).
+  - One PDF per booked item: a single test = its own PDF; a package = one PDF with a
+    section heading per test inside it. Every parameter has a real result, unit, reference
+    range and flag (Normal / Borderline / High / Low). Long reports continue on more pages:
+    compact header + patient strip, "<section> (continued)" when a page starts mid-section,
+    "Page X of N"; notes + result summary + doctor sign-off on the last page. Lists show the
+    real page count (e.g. "PDF - 4 pages"). The PDF title (shown in the browser tab) is
+    "<test> - <member>".
+  - Bookings made in the app get their report when the status reaches "Report ready"
+    (Advance status demo): values are generated from the reference ranges in api.js (REF),
+    seeded by booking + member so the same report always shows the same values. Reports
+    saved by the old generator ("Within limits" everywhere) are rebuilt automatically.
   - Printable documents share one BeyondSure design (taken from the official Tax Invoice):
     logo + company details, navy title with a status badge, blue line, rounded detail boxes,
     light-header table, notes + summary boxes and a centred footer. This applies to every lab
     report PDF and to the booking Tax Invoice (Invoice button on Confirmation and Appointment
     detail; invoice number format SH<FY>DG<booking digits>, amounts as "Rs. 0.00").
-
-lab-partner/register.html, lab-partner/dashboard.html, admin/lab-approvals.html
-  - See section 14.
-
 
 ===============================================================================================
 9. BUSINESS RULES
@@ -468,7 +559,8 @@ Members
   - The "Self" member's relationship cannot be changed.
 
 Slots
-  - 12 one-hour morning windows from 05:30 AM to 12:00 PM, every day, for every lab.
+  - 13 one-hour windows a day for every lab: 7 morning (05:00 AM - 12:00 PM) and 6 afternoon &
+    evening (12:00 - 07:00 PM, no 3-4 PM slot).
   - Same-day slots need at least 2 hours notice.
   - A chosen slot is held for 10 minutes until payment.
 
@@ -495,8 +587,8 @@ Changes and refunds
   - Where to manage: Profile menu -> "Family Members" (also in the mobile menu and footer).
     Cards show name, relationship, age, gender, mobile, email and tests in cart, with
     Edit / Complete profile / Remove (Self cannot be removed).
-  - Adding a member from inside the Select Member popup returns to the popup with that
-    member already ticked.
+  - Adding a member from the Lab Cart ("Add member" card) books all suitable tests for them
+    right away (untick any test on its card).
   - Removing a member also removes their tests from the cart (after confirmation).
   - Members, bookings, requests and reports belong to the logged-in mobile number, so a
     new account never sees another account's data.
@@ -548,21 +640,16 @@ step forward. When the report is ready the feedback popup can appear.
 
 
 ===============================================================================================
-14. LAB PARTNER AND ADMIN PAGES (PLATFORM DEMO)
+14. LAB PARTNER AND ADMIN PAGES (REMOVED)
 ===============================================================================================
 
-lab-partner/register.html
-  3 steps: 1 Business details (with mobile OTP) -> 2 Documents -> 3 Test catalogue and
-  service area -> submit. The application is "pending".
-
-admin/lab-approvals.html
-  Table of applications (Pending / Approved / Rejected / Needs info), documents popup,
-  Approve, Reject with reason, or ask for more info. Approving makes the lab visible in
-  Select Lab. (Demo: approve "Aarogya Pathology" -> it appears for pincode 411057.)
-
-lab-partner/dashboard.html
-  Tabs: New bookings (confirm / reject), Today's collections (assign technician, update
-  status), Reports (upload per member -> Report ready), Performance, Settlements.
+The platform-side demo pages were removed from this module:
+  lab-partner/register.html, lab-partner/dashboard.html, admin/lab-approvals.html
+  and their files (pages/lab-register.js, pages/lab-dashboard.js, pages/admin-approvals.js,
+  data/lab-portal.js, the lab-portal functions in core/api.js and their styles in lab.css).
+The footer "For Labs" links and the Demo tools links to them were removed too.
+The customer booking flow is not changed. "Aarogya Pathology" stays "pending", so it is
+not listed for customers (6 live Pune labs).
 
 
 ===============================================================================================
@@ -573,13 +660,13 @@ Browser storage (localStorage) keys:
   lt_state_v2   Current session: user, location, mode, cart, members per test,
                 chosen lab, address, slot, coupon, payment simulation.
   lt_db_v2      Demo "database": members, addresses, bookings, reports, requests,
-                lab applications, reviews, notify-me list.
+                reviews, notify-me list.
   lt_seeded_v2  Marks that demo data has been loaded once.
   "Reset demo data" clears these and loads the original sample data again.
 
 Demo partner labs (Pune): BeyondSure Care Labs, Apollo Diagnostics, Manipal Diagnostic
-  Services, Metro Path Labs, City Health Lab, Sanjeevani Diagnostics (+ Aarogya Pathology
-  after admin approval). Some labs also serve Mumbai.
+  Services, Metro Path Labs, City Health Lab, Sanjeevani Diagnostics. Some labs also serve
+  Mumbai. (Aarogya Pathology is "pending" and is not shown.)
 
 Demo account: 9876543210 - Riya Malhotra (Self), Karan (Spouse), Ishaan (Child),
   Usha (Mother), Rajesh (Father). Demo booking: LT-2026-004821.
@@ -597,14 +684,15 @@ Tip: start with Demo tools -> "Reset demo data" for a clean state.
 [ ] C. Change location -> type 411014 -> Home is "Selected for you" (centre not available).
 [ ] D. Change location -> type "Dhule" -> "Service not available" -> tap "Mumbai" ->
        suggestions for Mumbai appear.
-[ ] E. Logged out -> Add CBC -> Login popup -> OTP 123456 -> Select Member popup.
+[ ] E. Logged out -> Add CBC -> Login popup -> OTP 123456 -> added for Riya (no member popup).
 [ ] F. Tick Riya + Karan -> Add -> button shows "Added - 2".
 [ ] G. Try to add PSA for Riya -> she is disabled (men only).
 [ ] H. Cart -> tests grouped per person -> remove one test for one person only.
-[ ] I. Select Lab -> sort, filter, compare 3 labs -> choose one.
+[ ] I. Compare labs -> sort, filter, open the test lists -> Select & Continue on one lab.
 [ ] J. Location step -> only addresses of the chosen pincode are shown.
-[ ] K. Slot -> today shows "Full" if too late -> pick tomorrow 05:30 AM -> Confirm.
-[ ] L. Summary -> coupon CARE15 works, EXPIRED10 shows an error.
+[ ] K. Slot -> today shows "Full" if too late -> pick tomorrow 06:00 AM or an afternoon slot -> Confirm.
+[ ] L. Summary -> Bill details coupon box: CARE15 applies (coupon line + new total), EXPIRED10
+       and XYZ show an error under the box, Remove brings the box back.
 [ ] M. Demo tools -> Payment result "failed" -> Pay -> retry works.
 [ ] N. Pay successfully -> Confirmation page -> download .ics / invoice.
 [ ] O. Appointment detail -> Advance status -> timeline moves forward.
@@ -617,31 +705,52 @@ Tip: start with Demo tools -> "Reset demo data" for a clean state.
 [ ] T. Register a new number -> age under 18 is rejected.
 [ ] U. Mobile (375px) and tablet (768px): no sideways scroll; cart bar fully visible;
        popups open as bottom sheets.
-[ ] V. Admin approvals -> approve Aarogya Pathology -> it appears in Select Lab (411057).
+[ ] V. Footer has 4 groups (Get In Touch, Lab Tests, My Account, Services) - no "For Labs";
+       Demo tools page list has no lab-partner / admin pages.
+[ ] W. Logged out: Add Thyroid -> login (OTP 123456) -> added for Self -> the lab side-bar
+       opens with 5 labs and prices (x members when 2 people are ticked).
+[ ] X. Empty cart: Add Vitamin B12 -> side-bar lists 4 labs (Metro hidden, no "Not available")
+       -> Select City Health Lab -> side-bar closes, same page, ALL cards show "City Health
+       Lab" top-right (HbA1c / Iron cards: amber "Not at City Health Lab"). Add Lipid -> no side-bar, tag shown. Add HbA1c -> no side-bar, amber
+       "Not at City Health Lab" + warning. Compare labs -> City on top ("Your selected lab").
+[ ] Y. Compare labs: Metro Path Labs shows "2 of 3 tests" (no B12) -> Select & Continue ->
+       popup -> Cancel stays; Continue removes B12 and opens the Location step with Metro.
+[ ] Z. Centre visit: Add ECG -> Metro shows "Not available"; Select BeyondSure -> Compare
+       page -> Select & Continue -> "Choose a centre" popup (Wakad / Baner). Phone (375px): side-bar is full screen,
+       Compare page has no sideways scroll.
 
 
 ===============================================================================================
-17. MOBILE BOTTOM APP MENU (index.html)
+17. MOBILE BOTTOM APP MENU (every page)
 ===============================================================================================
 
 What it is
-  On phones (screens narrower than 768px) the landing page index.html shows an app-style
+  On phones (screens narrower than 768px) every customer page of Lab Tests shows an app-style
   menu fixed at the bottom of the screen:
     Lab Tests | Packages | Cart (round centre button with the cart count) | Appointments | Reports
-  - Lab Tests is highlighted (you are on that page).
+  - The tab of the current page is highlighted: landing / search / test detail / prescription
+    pages = Lab Tests; packages = Packages; cart, compare labs, location, slot, summary = Cart;
+    appointments, appointment detail, confirmation = Appointments; reports = Reports.
   - The cart count updates by itself when tests are added or removed.
   - Tablet and desktop do NOT show it; their layout is unchanged.
-  - The header is unchanged on every screen size.
 
 Where the code is
-  - Markup: assets/js/pages/index.js ("MOBILE BOTTOM APP MENU" block). The page adds the
-    class "lt-has-bnav" to <body>.
-  - Styles: assets/css/lab.css ("Mobile bottom app menu" block, classes lt-bnav-*).
+  - Markup: assets/js/core/layout.js (bottomNav(), called from mount()). The page gets the
+    class "lt-has-bnav" on <body>.
+  - Styles: assets/css/lab.css ("Mobile bottom app menu" blocks, classes lt-bnav-*).
 
 Nothing hides behind it
   - The cart bar, Demo tools button and Back-to-top button sit above the menu.
+  - Booking pages: the Continue / Pay bar sits right above the menu, and the round Cart button
+    sits flat inside the menu there (so it does not poke into the bar).
+  - Slot page: the sticky "Confirm Slot" button stops above the menu.
   - The footer gets extra bottom space so its last line can be read.
   - Hero search suggestions stop above the menu and the cart bar.
+
+Header login
+  - Logged out, the header shows one "Login" button (the old "Log in" link and "Register"
+    button were merged). It opens the Login popup; new users switch to its Register tab.
+    The mobile slide-out menu has the same single "Login" button.
 
 (The old preview page index-2.html was removed; only this bottom menu was kept.)
 
@@ -693,8 +802,8 @@ The front-end was built so the backend can be connected with minimum changes.
   - "Use my current location" always returns Wakad, Pune 411057 in the demo.
   - Cancellation documents: images are saved as a small preview; PDFs save only the name
     and size (the real file must go to the server later).
-  - Only morning slots exist (as per the approved design). Every slot is a fixed 1-hour
-    window, whatever the number of family members in the booking.
+  - Slots run 05:00 AM - 07:00 PM (morning + afternoon & evening, 3-4 PM break). Every slot
+    is a fixed 1-hour window, whatever the number of family members in the booking.
 
 
 ===============================================================================================
@@ -720,13 +829,15 @@ The front-end was built so the backend can be connected with minimum changes.
 21. SUMMARY OF RECENT CHANGES
 ===============================================================================================
 
+  - Lab partner and Admin demo pages removed (lab-partner/, admin/ and their scripts, data
+    and styles); footer "For Labs" column and Demo tools links removed. Booking flow unchanged.
   - Family member flow: every Add asks "who is this test for"; cart grouped per person;
     members.html removed; Family Members popup in the profile menu.
   - Login popup now also has Register (name, DOB 18+, gender, mobile, email, consent).
   - Location step: only addresses matching the pincode; live-location button and map
     removed for home mode.
-  - Slot page redesigned: date pills, 12 one-hour morning slots, fasting badge,
-    "Confirm Slot" button (sticky on mobile).
+  - Slot page redesigned: date pills, one-hour slots in two groups (Morning with fasting
+    badge, Afternoon & Evening), "Confirm Slot" button (sticky on mobile).
   - Cancel booking: reason "Other" asks for text + optional document upload.
   - Location popup: clear service card (which service is / is not available); collection
     type chosen inside the same popup (separate "How would you like..." popup removed);
@@ -738,6 +849,28 @@ The front-end was built so the backend can be connected with minimum changes.
   - Cart bar fixed on mobile and tablet (fully on screen).
   - Mobile bottom app menu added to index.html (phones only). Preview page index-2.html
     removed.
+  - Header: one "Login" button (no separate "Log in" / "Register"). Mobile bottom app menu on
+    every customer page (not only the landing page), with the current page's tab highlighted.
+  - Members are now chosen on the Lab Cart page (Step 1 member cards + member chips on every
+    test); the Select Member popup was removed. Add puts the test in the cart for Self.
+  - NEW BOOKING FLOW (price-comparison style): Add -> lab side-bar
+    (first test only; small lab cards, only labs that do the test; Select closes it and
+    tags the test cards with the lab) -> Lab cart -> Compare labs page
+    (test lists open / close like an FAQ, member names on every test) ->
+    Select & Continue (popup when a lab misses tests: Cancel / Continue) -> Location ->
+    Slot -> Summary & Pay.
+      New files: compare-labs.html, assets/js/pages/compare-labs.js,
+                 assets/js/core/lab-picker.js (added to every page).
+      Changed:   layout.js (Add opens the side-bar; "Lab" step = compare-labs.html),
+                 guards.js (no lab -> compare-labs.html), members-ui.js (the popup fully
+                 closes before the side-bar opens), api.js (getLabsForItem,
+                 compareSelection with member names per test), cart.js page / location / summary / appointment
+                 "Change lab" + "Repeat order" links -> compare-labs.html, lab.css.
+      Removed:   select-lab.html + pages/select-lab.js (auto-assign / map page) and the
+                 "Let us choose the best lab for you" link; Compare labs is the only Lab step.
+      Demo data: some labs no longer do every test (labs.js testsNotOffered), so partial
+                 labs ("2 of 3 tests") show up. Example: Metro Path Labs has no Vitamin B12,
+                 CRP or ECG; City Health Lab has no HbA1c, Iron or Testosterone.
 
 ===============================================================================================
                                          END OF DOCUMENT

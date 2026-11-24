@@ -36,7 +36,8 @@ lab-tests/
   test-detail.html?id=       Phase 7    test detail
   packages.html              Phase 7    packages + detail drawer + overlap rule
   cart.html                  Phase 8-10 cart grouped by family member (tests per person, add test for X, add / edit member)
-  select-lab.html            Phase 11   choose a lab (sort, filters, compare, map, partial coverage)
+  compare-labs.html          Phase 11   the "Lab" step: your lab + the same tests at other labs, Select & Continue
+                                        (partial-lab popup: Cancel / Continue)
   location.html              Phase 12   address (home) / centre confirmation
   slot.html                  Phase 13   date & slot
   summary.html               Phase 14   summary, coupons, bill, payment
@@ -44,12 +45,12 @@ lab-tests/
   appointments.html          Phase 15
   appointment-detail.html?id= Phase 15-18, 20, 21 timeline, reschedule, cancel, feedback…
   reports.html / report-view.html?id=   Phase 19   PDF reports: list (name / View / Download) + PDF viewer
-  lab-partner/register.html, lab-partner/dashboard.html, admin/lab-approvals.html  (platform demo)
   assets/css/lab.css
-  assets/js/core/   store, api, pricing, matching, cart, members-ui (Select Member popup), ui, layout, guards,
+  assets/js/core/   store, api, pricing, matching, cart, members-ui (add for Self, member form),
+                    lab-picker (lab side-bar "Choose a lab" after the first Add), ui, layout, guards,
                     report-pdf (demo PDF report + View / Download helpers)
   assets/js/data/   cities, tests, packages, labs, members, addresses, slots, coupons,
-                    bookings, reports, requests, ocr, lab-portal
+                    bookings, reports, requests, ocr
   assets/js/pages/  one script per page
 ```
 HTML files are thin shells; header, footer, stepper, cart bar and modals are injected by
@@ -57,16 +58,20 @@ HTML files are thin shells; header, footer, stepper, cart bar and modals are inj
 
 ## Suggested demo path
 1. `index.html` → pick location (Use my current location → Wakad 411057) → Home Collection.
-2. Book Lab Test → Search & Select → click **Add** on CBC → *Login to continue* (OTP 123456) → **Select Member** popup:
-   tick Riya + Karan → Add. Every later Add opens the same popup (Self + family + "Add family member"); an added test
-   re-opens it to change members. PSA is blocked for women. Add *Full Body Checkup* for Riya (duplicate prompt).
+2. Book Lab Test → Search & Select → click **Add** on CBC → *Login to continue* (OTP 123456) → added for Riya (no member
+   popup). Tapping **Added** removes it (Undo). Members are chosen in the **Lab Cart**: tap Karan's card to book all tests
+   for him, or use the member chips on each test; PSA is greyed out for women.
+   On the FIRST test the **lab side-bar** opens: small cards with the price at every lab that does
+   the test → *Select* (the side-bar closes, you stay on the page; every test card shows the lab name top-right; later
+   tests use this lab without asking) → Cart → **Compare labs**: your lab's "Tests & prices" drop-down (member names per test) on top, other
+   labs below (each with its own drop-down; Metro Path Labs shows "2 of 3 tests" when B12 is in the cart) →
+   *Select & Continue* → popup (Cancel stays / Continue removes B12) → Address → Slot → Summary → Pay.
 3. Cart: tests are grouped per person → Members / Remove per test, "Add test for Rajesh", tap another family member
-   chip to book for them, edit a profile → Continue to Select lab (sort / filter + Compare) → Address → Slot → Summary (try CARE15 / EXPIRED10) → Pay
+   chip to book for them, edit a profile → Continue to Compare labs → Address → Slot → Summary (try CARE15 / EXPIRED10) → Pay
    (set Failed first to see retry) → Confirmation.
 4. Appointments → open a booking → Advance status (demo) → reports, feedback, repeat order.
 5. Prescription: Upload Prescription → add all pages + details → Submit → popup "our team will connect with you" →
    My Prescription Requests (use Demo tools → "Mark request as identified" to simulate the call) → confirm → cart.
-6. Admin approvals → approve **Aarogya Pathology** → it appears in Select lab for 411057.
 
 ## Assumptions
 - Every test in the cart belongs to at least one family member (`assignments`); adding always asks who it is for.
@@ -80,11 +85,12 @@ HTML files are thin shells; header, footer, stepper, cart bar and modals are inj
 - Diagnostic tests are GST-exempt, so taxes show ₹0. Collection charge is once per booking.
 - A booking is created as `PENDING_PAYMENT` and becomes `CONFIRMED` on successful payment;
   "Pay at collection/centre" confirms immediately.
-- Slots: 12 one-hour morning windows (05:30 AM – 12:00 PM) for every lab, mode and group size;
+- Slots: 13 one-hour windows a day – Morning 05:00 AM – 12:00 PM and Afternoon & Evening 12:00 – 07:00 PM
+  (no 3–4 PM slot) – for every lab, mode and group size;
   same-day slots need 2 hours' notice and a chosen slot is held for 10 minutes.
 - Seeded members, addresses and reports belong to the demo account; a new mobile number gets its
   own "Self" member.
-- "Aarogya Pathology" starts as *pending* (so 6 live Pune labs) and goes live after admin approval.
+- "Aarogya Pathology" is *pending*, so it is not listed (6 live Pune labs). The lab-partner / admin demo pages were removed.
 - Imaging tests (Ultrasound, X-Ray, ECG) are centre-only and blocked in home mode.
 
 ## How to make this dynamic

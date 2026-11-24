@@ -2,8 +2,10 @@
    In production every report is a PDF uploaded by the lab and the API returns its URL.
    For the demo we build a real, valid one-page A4 PDF (no library, works on file://) from the
    report data, so "View" and "Download" behave exactly like they will with the lab's PDF.
+   One PDF per test (a package = one PDF with a section per test); long reports continue on more pages
+   (compact header + patient strip, "Page X of N"), notes + summary boxes on the last page.
    Design follows the BeyondSure document style (same as the Tax Invoice): company header,
-   navy serif title + status badge, blue rule, rounded detail boxes, light-header table,
+   navy serif title + status badge, blue rule, rounded detail boxes, light-header table (section rows for packages),
    notes + summary boxes and a centred footer.
    LT.reportPdf.build({ report, file, params }) -> PDF as a plain ASCII string. */
 window.LT = window.LT || {};
@@ -18,9 +20,11 @@ window.LT = window.LT || {};
   const rgb = (hex) => { const n = parseInt(hex.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => (v / 255).toFixed(3)).join(' '); };
   const f2 = (n) => (Math.round(n * 100) / 100).toString();
   /* colours taken from the BeyondSure invoice */
-  const C = { brand: '#1964ee', title: '#1d4fb8', navy: '#13285a', text: '#1f2a44', muted: '#6b7488', faint: '#98a1b2',
+  const C = {
+    brand: '#1964ee', title: '#1d4fb8', navy: '#13285a', text: '#1f2a44', muted: '#6b7488', faint: '#98a1b2',
     line: '#dfe5f0', rowline: '#e6eaf2', box: '#f8fafc', head: '#f2f5fa', headline: '#d5dcea',
-    okBg: '#e8f8ef', okLine: '#b9e8cc', ok: '#0e8a50', normal: '#0e9f6e', borderline: '#b7791f', abnormal: '#d93036' };
+    okBg: '#e8f8ef', okLine: '#b9e8cc', ok: '#0e8a50', normal: '#0e9f6e', borderline: '#b7791f', abnormal: '#d93036'
+  };
 
   /* exact character widths (1/1000 em) of the PDF standard fonts for ASCII 32..126 (Adobe AFM metrics),
      so right-aligned, centred and wrapped text lands exactly where it should */
@@ -38,41 +42,86 @@ window.LT = window.LT || {};
     return (w / 1000) * size;
   }
 
+  /* page layout (points): first page table starts under the header + detail boxes; later pages under a compact header */
+  const ROW = 26, SEC = 22, FOOT = 64, FIRST_TOP = H - 172 - 104 - 30 - 16 - 24, NEXT_TOP = H - 124 - 24;
+  /* rows of the results table: a section row before each test of a package, then its parameters */
+  function rowsOf(params) {
+    const out = []; let sec = null;
+    params.forEach((p) => { if (p.section && p.section !== sec) { sec = p.section; out.push({ heading: sec }); } out.push(p); });
+    return out;
+  }
+  const notesOf = (params) => {
+    const flag = (p) => (p.status === 'normal' ? 'normal' : p.status === 'abnormal' ? (p.dir === 'low' ? 'low' : 'high') : (p.dir === 'low' ? 'borderline low' : 'borderline high'));
+    const bad = params.filter((p) => p.status !== 'normal');
+    const list = bad.slice(0, 6).map((p) => `${p.name} is ${flag(p)} (${p.value} ${asc(p.unit)}).`.replace(' ().', '.').replace(/ \)/, ')'));
+    if (bad.length > 6) list.push(`${bad.length - 6} more value${bad.length - 6 > 1 ? 's need' : ' needs'} attention - see the table above.`);
+    return (list.length ? list : ['All values are within the reference range.'])
+      .concat(['Values outside the range do not always mean illness - please discuss them with your doctor.', 'Fasting status and medicines can affect some results.']);
+  };
+  /* notes box lines (wrapped to the box width) */
+  const BOXW = (R - M - 4 - 18) / 2;
+  const noteLinesOf = (params, wrap) => { const out = []; notesOf(params).forEach((s) => wrap(s, 8.8, BOXW - 40).forEach((l, i) => out.push([l, i === 0]))); return out; };
+  const wrapText = (s, size, maxW, font) => { const out = []; let cur = ''; asc(s).split(/\s+/).forEach((w) => { const x = cur ? cur + ' ' + w : w; if (width(x, size, font) > maxW && cur) { out.push(cur); cur = w; } else cur = x; }); if (cur) out.push(cur); return out; };
+  /* page plan shared by build() and pageCount(): which rows go on which page.
+     A section heading never sits alone at the bottom of a page (it moves down with its first row), and a page that
+     starts in the middle of a section repeats "<section> (continued)". The notes + summary boxes need their full
+     height on the last page, else they start a new page. */
+  function plan(params) {
+    const items = []; let y = FIRST_TOP, page = 0, sec = null;
+    const rows = rowsOf(params);
+    const brk = () => { page++; y = NEXT_TOP; if (sec) { items.push({ page, heading: sec, cont: true }); y -= SEC; } };
+    rows.forEach((row, i) => {
+      if (row.heading) {
+        sec = row.heading;
+        if (y - SEC - ROW < FOOT + 10) { page++; y = NEXT_TOP; }
+        items.push({ page, heading: row.heading }); y -= SEC; return;
+      }
+      if (y - ROW < FOOT + 10) brk();
+      items.push({ page, param: row }); y -= ROW;
+    });
+    const nb = Math.max(118, 44 + noteLinesOf(params, wrapText).length * 12.5);
+    const boxesNewPage = y - 22 - nb - 50 < FOOT - 30;
+    return { items, nb, boxesNewPage, pages: page + 1 + (boxesNewPage ? 1 : 0) };
+  }
+  /* how many pages a report file needs (used for the "N pages" label in lists) */
+  const pageCount = (params) => plan(params).pages;
+
   function build({ report, file, params }) {
-    const ops = [];
+    const pages = []; let ops = null;
+    const newPage = () => { ops = []; pages.push(ops); };
     const fill = (c) => `${rgb(c)} rg`, stroke = (c) => `${rgb(c)} RG`;
     const rect = (x, y, w, h, c) => ops.push(`${fill(c)} ${f2(x)} ${f2(y)} ${f2(w)} ${f2(h)} re f`);
     const line = (x1, y1, x2, y2, c, wd) => ops.push(`${stroke(c)} ${wd || 0.6} w ${f2(x1)} ${f2(y1)} m ${f2(x2)} ${f2(y2)} l S`);
     const rrect = (x, y, w, h, r, bg, border, bw) => {
       const k = 0.5523 * r, p = [`${f2(x + r)} ${f2(y)} m`, `${f2(x + w - r)} ${f2(y)} l`, `${f2(x + w - r + k)} ${f2(y)} ${f2(x + w)} ${f2(y + r - k)} ${f2(x + w)} ${f2(y + r)} c`,
-        `${f2(x + w)} ${f2(y + h - r)} l`, `${f2(x + w)} ${f2(y + h - r + k)} ${f2(x + w - r + k)} ${f2(y + h)} ${f2(x + w - r)} ${f2(y + h)} c`, `${f2(x + r)} ${f2(y + h)} l`,
-        `${f2(x + r - k)} ${f2(y + h)} ${f2(x)} ${f2(y + h - r + k)} ${f2(x)} ${f2(y + h - r)} c`, `${f2(x)} ${f2(y + r)} l`, `${f2(x)} ${f2(y + r - k)} ${f2(x + r - k)} ${f2(y)} ${f2(x + r)} ${f2(y)} c h`].join(' ');
+      `${f2(x + w)} ${f2(y + h - r)} l`, `${f2(x + w)} ${f2(y + h - r + k)} ${f2(x + w - r + k)} ${f2(y + h)} ${f2(x + w - r)} ${f2(y + h)} c`, `${f2(x + r)} ${f2(y + h)} l`,
+      `${f2(x + r - k)} ${f2(y + h)} ${f2(x)} ${f2(y + h - r + k)} ${f2(x)} ${f2(y + h - r)} c`, `${f2(x)} ${f2(y + r)} l`, `${f2(x)} ${f2(y + r - k)} ${f2(x + r - k)} ${f2(y)} ${f2(x + r)} ${f2(y)} c h`].join(' ');
       ops.push(`${bg ? fill(bg) + ' ' : ''}${border ? stroke(border) + ' ' + (bw || 0.8) + ' w ' : ''}${p} ${bg && border ? 'B' : bg ? 'f' : 'S'}`);
     };
-    /* fonts: F1 Helvetica, F2 Helvetica-Bold, F3 Times-Bold, F4 Times-Roman */
-    /* Tc (letter spacing) persists in a PDF until changed, so every text block sets it explicitly */
+    /* fonts: F1 Helvetica, F2 Helvetica-Bold, F3 Times-Bold, F4 Times-Roman.
+       Tc (letter spacing) persists in a PDF until changed, so every text block sets it explicitly */
     const text = (x, y, s, size, o) => { o = o || {}; const fnt = o.font || 'F1'; ops.push(`BT /${fnt} ${size} Tf ${fill(o.color || C.text)} ${o.cs || 0} Tc ${f2(x)} ${f2(y)} Td ${pdfStr(s)} Tj ET`); return width(s, size, fnt) + (o.cs ? o.cs * asc(s).length : 0); };
     const right = (xr, y, s, size, o) => text(xr - width(s, size, (o && o.font) || 'F1') - ((o && o.cs) ? o.cs * asc(s).length : 0), y, s, size, o);
     const center = (xm, y, parts) => { const tot = parts.reduce((n, p) => n + width(p[0], p[1], p[2].font || 'F1'), 0); let x = xm - tot / 2; parts.forEach((p) => { x += text(x, y, p[0], p[1], p[2]); }); };
     const wrap = (s, size, maxW, font) => { const out = []; let cur = ''; asc(s).split(/\s+/).forEach((w) => { const t = cur ? cur + ' ' + w : w; if (width(t, size, font) > maxW && cur) { out.push(cur); cur = w; } else cur = t; }); if (cur) out.push(cur); return out; };
+    const fit = (s, size, maxW, font) => { let t = asc(s); if (width(t, size, font) <= maxW) return t; while (t.length > 3 && width(t + '...', size, font) > maxW) t = t.slice(0, -1); return t.trim() + '...'; };
     const cap = (x, y, s) => text(x, y, s.toUpperCase(), 7.6, { font: 'F2', color: '#5b6474', cs: 0.9 }); // box headings: small caps style
 
     const lab = report.lab || {}, mem = report.member || {};
     const dt = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
     const reportNo = 'BSR' + file.id.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     const badges = (lab.badges || []).filter((b) => ['NABL', 'CAP', 'ISO'].includes(b));
+    const logo = (x, y, s) => { const k = s / 19; x += text(x, y, 'Beyond', s, { font: 'F2', color: C.navy }); text(x, y, 'Sure', s, { font: 'F2', color: C.brand }); text(x + width('Sure', s, 'F2') - k, y + 10 * k, '+', 11 * k, { font: 'F2', color: C.brand }); };
 
-    /* ---------- header: logo + company (left) | title + meta + badge (right) ---------- */
-    let x = M, y = H - 58;
-    x += text(x, y, 'Beyond', 19, { font: 'F2', color: C.navy });
-    text(x, y, 'Sure', 19, { font: 'F2', color: C.brand });
-    text(x + width('Sure', 19, 'F2') - 1, y + 10, '+', 11, { font: 'F2', color: C.brand });
+    /* ---------- page 1 header: logo + company (left) | title + meta + badge (right) ---------- */
+    newPage();
+    let y = H - 58;
+    logo(M, y, 19);
     text(M + 14, y - 10, 'Click.     Care.     Relax.', 6.5, { color: C.muted });
     text(M, y - 26, 'BeyondSure Private Limited', 10, { font: 'F2', color: C.text });
     text(M, y - 40, '203, Shivam Square, 4 Sahar Road, Andheri (E), Mumbai 400069,', 8.6, { color: C.muted });
     text(M, y - 52, 'Maharashtra, India', 8.6, { color: C.muted });
     text(M, y - 66, 'Email: support@shrigodahealthcare.com', 8.6, { color: C.muted });
-
     right(R, H - 62, 'LAB REPORT', 24, { font: 'F3', color: C.title });
     right(R, H - 82, 'Report #: ' + reportNo, 10, { font: 'F2', color: C.text });
     const dLbl = 'Date: ', dVal = dt(report.date);
@@ -89,8 +138,8 @@ window.LT = window.LT || {};
     const box = (x0, title, big, rows) => {
       rrect(x0, btop - bh, bwid, bh, 6, C.box, C.line);
       cap(x0 + 13, btop - 19, title); line(x0 + 13, btop - 26, x0 + bwid - 13, btop - 26, C.line, 0.6);
-      text(x0 + 13, btop - 44, big, 11.5, { font: 'F2', color: C.text });
-      rows.forEach(([k, v], i) => { const yy = btop - 62 - i * 15; text(x0 + 13, yy, k, 9, { font: 'F3', color: C.muted }); text(x0 + 100, yy, v, 9.2, { font: 'F3', color: C.text }); });
+      text(x0 + 13, btop - 44, fit(big, 11.5, bwid - 26, 'F2'), 11.5, { font: 'F2', color: C.text });
+      rows.forEach(([k, v], i) => { const yy = btop - 62 - i * 15; text(x0 + 13, yy, k, 9, { font: 'F3', color: C.muted }); text(x0 + 100, yy, fit(v, 9.2, bwid - 113, 'F3'), 9.2, { font: 'F3', color: C.text }); });
     };
     box(bx, 'Patient details', mem.name || '-', [
       ['Age / Gender:', (mem.age ? mem.age + ' yrs' : '-') + ' / ' + (mem.gender === 'male' ? 'Male' : mem.gender === 'female' ? 'Female' : '-')],
@@ -98,44 +147,63 @@ window.LT = window.LT || {};
       ['Booking ID:', report.bookingId || '-']]);
     box(bx + bwid + gap, 'Lab & sample details', lab.name || 'Partner Lab', [
       ['Accreditation:', badges.length ? badges.join(', ') + ' accredited' : 'Accredited laboratory'],
-      ['Sample type:', 'Blood / Serum'],
+      ['Sample type:', file.sampleType || 'Blood'],
       ['Reported on:', dt(report.date)]]);
 
-    /* ---------- results table ---------- */
-    y = btop - bh - 30;
-    text(M + 2, y, file.name, 13, { font: 'F2', color: C.text });
-    const chip = 'Verified by pathologist', cw = width(chip, 7.2, 'F2') + 12, cx = M + 2 + width(file.name, 13, 'F2') + 10;
-    rrect(cx, y - 3.5, cw, 14, 2, C.okBg, C.okLine); text(cx + 6, y + 0.5, chip, 7.2, { font: 'F2', color: C.ok });
-    y -= 16;
-    rect(M, y - 24, R - M, 24, C.head); line(M, y, R, y, C.line, 0.8); line(M, y - 24, R, y - 24, C.headline, 1.4);
-    const col = { n: M + 12, p: M + 36, r: M + 232, u: M + 296, g: M + 366 };
-    const th = (xx, s) => text(xx, y - 15.5, s, 7.6, { font: 'F2', color: '#3b4560', cs: 0.6 });
-    th(col.n, '#'); th(col.p, 'TEST PARAMETER'); th(col.r, 'RESULT'); th(col.u, 'UNIT'); th(col.g, 'REFERENCE RANGE');
-    right(R - 12, y - 15.5, 'FLAG', 7.6, { font: 'F2', color: '#3b4560', cs: 0.6 });
-    y -= 24;
-    const rangeTxt = (p) => (p.low == null ? 'Refer note' : p.low === 0 ? '< ' + p.high : p.low + ' - ' + p.high);
+    /* ---------- results table (continues on the next pages when it is long) ---------- */
+    const col = { n: M + 12, p: M + 36, r: M + 232, u: M + 300, g: M + 370 };
+    const tableHead = (yTop, cont) => {
+      text(M + 2, yTop, fit(file.name, 13, 300, 'F2') + (cont ? ' (continued)' : ''), 13, { font: 'F2', color: C.text });
+      if (!cont) { const chip = 'Verified by pathologist', cw = width(chip, 7.2, 'F2') + 12, cx = M + 2 + width(fit(file.name, 13, 300, 'F2'), 13, 'F2') + 10; rrect(cx, yTop - 3.5, cw, 14, 2, C.okBg, C.okLine); text(cx + 6, yTop + 0.5, chip, 7.2, { font: 'F2', color: C.ok }); }
+      const yh = yTop - 16;
+      rect(M, yh - 24, R - M, 24, C.head); line(M, yh, R, yh, C.line, 0.8); line(M, yh - 24, R, yh - 24, C.headline, 1.4);
+      const th = (xx, s) => text(xx, yh - 15.5, s, 7.6, { font: 'F2', color: '#3b4560', cs: 0.6 });
+      th(col.n, '#'); th(col.p, 'TEST PARAMETER'); th(col.r, 'RESULT'); th(col.u, 'UNIT'); th(col.g, 'REFERENCE RANGE');
+      right(R - 12, yh - 15.5, 'FLAG', 7.6, { font: 'F2', color: '#3b4560', cs: 0.6 });
+      return yh - 24;
+    };
+    /* later pages: compact header + patient strip */
+    const contHeader = () => {
+      newPage();
+      logo(M, H - 50, 14);
+      right(R, H - 48, 'LAB REPORT', 15, { font: 'F3', color: C.title });
+      right(R, H - 62, 'Report #: ' + reportNo, 8.5, { font: 'F2', color: C.muted });
+      line(M, H - 72, R, H - 72, C.title, 1.2);
+      rrect(M, H - 100, R - M, 20, 4, C.box, C.line);
+      text(M + 10, H - 93.5, fit((mem.name || '-') + '  -  ' + (mem.relationship || '') + '  -  Booking ' + (report.bookingId || '-'), 8.6, R - M - 20 - 130, 'F2'), 8.6, { font: 'F2', color: C.text });
+      right(R - 10, H - 93.5, (lab.name || '') ? fit(lab.name, 8.4, 125) : '', 8.4, { color: C.muted });
+      return H - 124;
+    };
+    const rangeTxt = (p) => (p.text ? '-' : p.low == null && p.high == null ? 'Refer note' : p.high == null ? '> ' + p.low : (p.low === 0 || p.low == null) ? '< ' + p.high : p.low + ' - ' + p.high);
     const flag = (p) => (p.status === 'normal' ? 'Normal' : p.status === 'abnormal' ? (p.dir === 'low' ? 'Low' : 'High') : (p.dir === 'low' ? 'Borderline low' : 'Borderline high'));
-    params.forEach((p, i) => {
-      const yy = y - 18, c = C[p.status] || C.text;
-      text(col.n, yy, String(i + 1), 9.5, { font: 'F2', color: C.faint });
-      text(col.p, yy, p.name, 10, { font: 'F2', color: C.text });
-      text(col.r, yy, String(p.value), 10, { font: 'F2', color: c });
-      text(col.u, yy, p.unit, 9, { color: C.muted });
-      text(col.g, yy, rangeTxt(p), 9.2, { color: C.text });
+
+    y = tableHead(btop - bh - 30, false);
+    const pl = plan(params);
+    let n = 0, onPage = 0;
+    pl.items.forEach((it) => {
+      if (it.page !== onPage) { onPage = it.page; y = tableHead(contHeader(), true); }
+      if (it.heading) {
+        rect(M, y - SEC, R - M, SEC, '#f7f9fd'); line(M, y - SEC, R, y - SEC, C.rowline, 0.7);
+        text(col.n, y - 14.5, it.heading.toUpperCase() + (it.cont ? '  (CONTINUED)' : ''), 7.8, { font: 'F2', color: C.title, cs: 0.7 });
+        y -= SEC; return;
+      }
+      const p = it.param, yy = y - 17, c = C[p.status] || C.text;
+      n++;
+      text(col.n, yy, String(n), 9.5, { font: 'F2', color: C.faint });
+      text(col.p, yy, fit(p.name, 10, col.r - col.p - 10, 'F2'), 10, { font: 'F2', color: C.text });
+      text(col.r, yy, fit(String(p.value), p.text ? 8.8 : 10, (p.text ? R - 12 - 60 : col.u - 8) - col.r, 'F2'), p.text ? 8.8 : 10, { font: 'F2', color: c });
+      if (!p.text) { text(col.u, yy, fit(p.unit, 9, col.g - col.u - 8), 9, { color: C.muted }); text(col.g, yy, rangeTxt(p), 9.2, { color: C.text }); }
       right(R - 12, yy, flag(p), 9, { font: 'F2', color: c });
-      y -= 28; line(M, y, R, y, C.rowline, 0.7);
+      y -= ROW; line(M, y, R, y, C.rowline, 0.7);
     });
 
-    /* ---------- notes + summary boxes ---------- */
-    const bad = params.filter((p) => p.status !== 'normal');
-    const notes = (bad.length ? bad.map((p) => `${p.name} is ${flag(p).toLowerCase()} (${p.value} ${asc(p.unit)}).`) : ['All values are within the reference range.'])
-      .concat(['Values outside the range do not always mean illness - please discuss them with your doctor.', 'Fasting status and medicines can affect some results.']);
-    const noteLines = []; notes.forEach((n) => wrap(n, 8.8, bwid - 40).forEach((l, i) => noteLines.push([l, i === 0])));
-    const nb = Math.max(118, 44 + noteLines.length * 12.5), ntop = y - 22;
+    /* ---------- notes + summary boxes (next page if they do not fit) ---------- */
+    const noteLines = noteLinesOf(params, wrap), nb = pl.nb;
+    if (pl.boxesNewPage) y = contHeader() + 10;
+    const ntop = y - 22;
     rrect(bx, ntop - nb, bwid, nb, 6, C.box, C.line);
     cap(bx + 13, ntop - 19, 'Interpretation & notes'); line(bx + 13, ntop - 26, bx + bwid - 13, ntop - 26, C.line, 0.6);
     noteLines.forEach(([l, first], i) => { const yy = ntop - 42 - i * 12.5; if (first) text(bx + 16, yy, '-', 8.8, { font: 'F2', color: C.muted }); text(bx + 25, yy, l, 8.8, { color: '#3b4560' }); });
-
     const sx = bx + bwid + gap;
     rrect(sx, ntop - nb, bwid, nb, 6, C.box, C.line);
     cap(sx + 13, ntop - 19, 'Result summary'); line(sx + 13, ntop - 26, sx + bwid - 13, ntop - 26, C.line, 0.6);
@@ -149,30 +217,38 @@ window.LT = window.LT || {};
     right(sx + bwid - 13, vy - 6, 'Dr. S. Kulkarni, MD', 10.5, { font: 'F3', color: C.title });
     right(sx + bwid - 13, vy - 19, 'Pathology - Reg. MMC 2011/04/1234', 7.8, { color: C.muted });
 
-    /* ---------- footer ---------- */
-    const fy = Math.max(ntop - nb - 26, 72); // right under the boxes, like the invoice
+    /* ---------- closing note (last page) + page numbers (every page) ---------- */
+    const fy = Math.max(ntop - nb - 26, 72);
     line(M, fy, R, fy, C.rowline, 0.8);
     center(W / 2, fy - 18, [['This is a computer-generated report, electronically verified by the pathologist, and does not require a physical signature.', 8.2, { color: C.faint }]]);
     center(W / 2, fy - 33, [['Thank you for choosing ', 8.2, { color: C.faint }], ['BeyondSure Healthcare', 8.2, { font: 'F2', color: C.muted }], [' for your diagnostic and health needs.', 8.2, { color: C.faint }]]);
-    text(M, 30, 'Demo report generated from sample data', 7, { color: C.faint });
-    right(R, 30, 'Page 1 of 1', 7, { color: C.faint });
+    pages.forEach((pg, i) => {
+      ops = pg;
+      text(M, 30, 'Demo report generated from sample data', 7, { color: C.faint });
+      if (pages.length > 1 && i < pages.length - 1) center(W / 2, 30, [['Continued on next page', 7, { color: C.faint }]]);
+      right(R, 30, 'Page ' + (i + 1) + ' of ' + pages.length, 7, { color: C.faint });
+    });
 
-    /* ---------- assemble the PDF (ASCII only, so string length = byte length) ---------- */
-    const stream = ops.join('\n');
+    /* ---------- assemble the PDF (ASCII only, so string length = byte length) ----------
+       1 catalog, 2 pages, 3-6 fonts, 7 info, then per page: page object + content stream */
     const font = (name) => `<< /Type /Font /Subtype /Type1 /BaseFont /${name} /Encoding /WinAnsiEncoding >>`;
+    const pageIds = pages.map((_, i) => 8 + i * 2);
     const objs = [
-      '<< /Type /Catalog /Pages 2 0 R >>',
-      '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 5 0 R /F2 6 0 R /F3 7 0 R /F4 8 0 R >> >> /Contents 4 0 R >>`,
-      `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+      '<< /Type /Catalog /Pages 2 0 R /ViewerPreferences << /DisplayDocTitle true >> >>',
+      `<< /Type /Pages /Kids [${pageIds.map((id) => id + ' 0 R').join(' ')}] /Count ${pages.length} >>`,
       font('Helvetica'), font('Helvetica-Bold'), font('Times-Bold'), font('Times-Roman'),
-      `<< /Title ${pdfStr(file.name + ' - ' + (mem.name || ''))} /Author ${pdfStr(lab.name || 'Partner Lab')} /Creator (BeyondSure Lab Tests) >>`
+      `<< /Title ${pdfStr(file.name + ' - ' + (mem.name || ''))} /Author ${pdfStr(lab.name || 'Partner Lab')} /Subject ${pdfStr('Lab report ' + reportNo)} /Creator (BeyondSure Lab Tests) >>`
     ];
+    pages.forEach((pg, i) => {
+      const stream = pg.join('\n');
+      objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents ${pageIds[i] + 1} 0 R >>`);
+      objs.push(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+    });
     let out = '%PDF-1.4\n';
     const offsets = objs.map((o, i) => { const at = out.length; out += `${i + 1} 0 obj\n${o}\nendobj\n`; return at; });
     const xref = out.length;
     out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offsets.map((o) => String(o).padStart(10, '0') + ' 00000 n \n').join('');
-    out += `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R /Info ${objs.length} 0 R >>\nstartxref\n${xref}\n%%EOF`;
+    out += `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R /Info 7 0 R >>\nstartxref\n${xref}\n%%EOF`;
     return out;
   }
 
@@ -209,9 +285,10 @@ window.LT = window.LT || {};
     const body = inlinePdf()
       ? `<div class="lt-pdfv"><iframe class="lt-pdfv-frame" src="${f.href}#view=FitH" title="${U.esc(f.name)} report (PDF)"></iframe></div>`
       : `<div class="lt-pdfv-fallback"><span class="lt-pdfv-ico"><i class="bi bi-file-earmark-pdf-fill" aria-hidden="true"></i></span>
-          <b>${U.esc(f.fileName)}</b><small>PDF · ${kb(f.size)}</small>
+          <b>${U.esc(f.fileName)}</b><small style="color:white;" >PDF · ${kb(f.size)}</small>
           <p>Your phone opens PDF reports in its own viewer. Tap <b>Open report</b> to read it, or download it to keep a copy.</p></div>`;
-    const md = U.modal.open({ title: f.name, sub: o.sub || 'PDF report shared by the lab', size: 'xl',
+    const md = U.modal.open({
+      title: f.name, sub: o.sub || 'PDF report shared by the lab', size: 'xl',
       body, footer: `<a class="btn lt-btn-outline" href="${f.href}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i> ${inlinePdf() ? 'Open in new tab' : 'Open report'}</a>
         <button type="button" class="btn lt-btn" data-dl><i class="bi bi-download"></i> Download PDF</button>` });
     md.el.classList.add('lt-pdfv-modal');
@@ -247,5 +324,5 @@ window.LT = window.LT || {};
     }
   }
 
-  LT.reportPdf = { build, asc, fileUrl, view, download, openTab, inlinePdf, kb };
+  LT.reportPdf = { build, pageCount, asc, fileUrl, view, download, openTab, inlinePdf, kb };
 })();
