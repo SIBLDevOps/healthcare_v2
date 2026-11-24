@@ -1,6 +1,8 @@
 /* Lab Tests – dummy data: partner labs (8). 6 are live in Pune.
-   "Aarogya Pathology" starts as status "pending" and only shows up in
-   select-lab after an admin approves it (admin/lab-approvals.html).
+   testsNotOffered: some labs do not do every test, so the side-bar and Compare labs page show
+   "2 of 3 tests" style partial labs.
+   "Aarogya Pathology" has status "pending", so it is not shown in the lab side-bar /
+   Compare labs (only "active" labs are listed).
    Lab price for a test = round(test.price * priceFactor)
    Lab TAT = max(4, test.tatHours + tatDelta) */
 window.LT = window.LT || {}; LT.data = LT.data || {};
@@ -29,17 +31,17 @@ window.LT = window.LT || {}; LT.data = LT.data || {};
       centres: [{ id: 'c-mn-baner', name: 'Manipal Hospital Lab – Baner', address: 'Survey 39, Baner-Pashan Link Road, Baner, Pune', pincode: '411045', lat: 18.556, lng: 73.790, hours: '24 hours', openNow: true, amenities: ['parking', 'wheelchair', 'ac', 'cafe'], distanceKm: 5.1, x: 66, y: 54 }] },
     { id: 'lab-metro', name: 'Metro Path Labs', initials: 'MP', color: '#e5484d', badges: ['NABL'], rating: 4.3, reviews: 3120,
       priceFactor: 0.82, tatDelta: 6, homeCollection: true, collectionCharge: 79, freeAbove: 799, serviceablePincodes: ['411057', '411045', '411014'],
-      testsNotOffered: ['ecg', 'usg'], status: 'active', phone: '+91 20 2730 1188', founded: 2014,
+      testsNotOffered: ['ecg', 'usg', 'b12', 'crp', 'vitd-total'], status: 'active', phone: '+91 20 2730 1188', founded: 2014,
       about: 'Budget-friendly pathology lab focused on routine blood tests with quick home collection.',
       centres: [{ id: 'c-mt-wakad', name: 'Metro Path Labs – Datta Mandir Chowk', address: 'Datta Mandir Road, Wakad, Pune', pincode: '411057', lat: 18.601, lng: 73.765, hours: '7:00 AM - 8:00 PM', openNow: false, amenities: ['ac'], distanceKm: 0.8, x: 40, y: 22 }] },
     { id: 'lab-city', name: 'City Health Lab', initials: 'CH', color: '#f59e0b', badges: ['ISO'], rating: 4.1, reviews: 1890,
       priceFactor: 0.86, tatDelta: 4, homeCollection: true, collectionCharge: 59, freeAbove: 599, serviceablePincodes: ['411057', '411038', '411014'],
-      testsNotOffered: ['vitd-total', 'testosterone'], status: 'active', phone: '+91 20 2546 7711', founded: 2016,
+      testsNotOffered: ['vitd-total', 'testosterone', 'hba1c', 'iron', 'xray'], status: 'active', phone: '+91 20 2546 7711', founded: 2016,
       about: 'Neighbourhood lab with two decades of experience serving families in west Pune.',
       centres: [{ id: 'c-ch-kothrud', name: 'City Health Lab – Kothrud', address: 'Karve Road, near Kothrud Depot, Pune', pincode: '411038', lat: 18.507, lng: 73.808, hours: '7:00 AM - 9:00 PM', openNow: true, amenities: ['wheelchair'], distanceKm: 9.4, x: 74, y: 80 }] },
     { id: 'lab-sanjeevani', name: 'Sanjeevani Diagnostics', initials: 'SD', color: '#12a150', badges: ['NABL', 'ISO'], rating: 4.5, reviews: 2760,
       priceFactor: 0.95, tatDelta: 2, homeCollection: false, collectionCharge: 0, freeAbove: 0, serviceablePincodes: ['411057', '411045', '411038', '411005'],
-      testsNotOffered: ['psa'], status: 'active', phone: '+91 20 2553 9090', founded: 2008,
+      testsNotOffered: ['psa', 'thyroid'], status: 'active', phone: '+91 20 2553 9090', founded: 2008,
       about: 'Walk-in diagnostic centres with in-house imaging (ultrasound, X-ray, ECG) and same-day reports.',
       centres: [
         { id: 'c-sj-shivaji', name: 'Sanjeevani Diagnostics – Shivajinagar', address: 'FC Road, Shivajinagar, Pune', pincode: '411005', lat: 18.530, lng: 73.847, hours: '7:00 AM - 9:30 PM', openNow: true, amenities: ['parking', 'wheelchair', 'ac'], distanceKm: 7.2, x: 82, y: 36 },
@@ -47,7 +49,7 @@ window.LT = window.LT || {}; LT.data = LT.data || {};
       ] },
     { id: 'lab-lifeline', name: 'Lifeline Labs', initials: 'LL', color: '#0b1b3f', badges: ['NABL'], rating: 4.4, reviews: 4300,
       priceFactor: 0.9, tatDelta: 2, homeCollection: true, collectionCharge: 49, freeAbove: 699, serviceablePincodes: ['400001', '400069'],
-      testsNotOffered: ['usg'], status: 'active', phone: '+91 22 6110 2200', founded: 2010,
+      testsNotOffered: ['usg', 'vitd', 'iron'], status: 'active', phone: '+91 22 6110 2200', founded: 2010,
       about: 'Metro-city lab chain with evening home collection slots.',
       centres: [{ id: 'c-ll-fort', name: 'Lifeline Labs – Fort', address: 'DN Road, Fort, Mumbai', pincode: '400001', lat: 18.933, lng: 72.835, hours: '7:00 AM - 9:00 PM', openNow: true, amenities: ['ac'], distanceKm: 1.5, x: 50, y: 50 }] },
     { id: 'lab-aarogya', name: 'Aarogya Pathology', initials: 'AP', color: '#0849c1', badges: ['NABL', 'ISO'], rating: 4.2, reviews: 640,

@@ -11,7 +11,7 @@ window.LT = window.LT || {};
   const base = () => document.body.dataset.ltBase || '';
   const url = (p) => base() + p;
   const site = (p) => base() + '../' + p;
-  const STEPS = [['cart', 'Cart & Members', 'cart.html'], ['lab', 'Lab', 'select-lab.html'], ['location', 'Location', 'location.html'], ['slot', 'Slot', 'slot.html'], ['pay', 'Pay', 'summary.html']];
+  const STEPS = [['cart', 'Cart & Members', 'cart.html'], ['lab', 'Lab', 'compare-labs.html'], ['location', 'Location', 'location.html'], ['slot', 'Slot', 'slot.html'], ['pay', 'Pay', 'summary.html']];
   const LOGO = 'https://teleconsult.bysure.in/images/beyondsure-logo_light.png';
   let opts = {};
 
@@ -37,7 +37,7 @@ window.LT = window.LT || {};
             <button class="bys-icon-btn lt-profile-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">${U().avatar(user.name, null, 'sm')}</button>
             <ul class="dropdown-menu dropdown-menu-end lt-dropdown"><li class="lt-dd-head"><strong>${U().esc(user.name)}</strong><small>+91 ${U().esc(user.mobile)}</small></li><li><hr class="dropdown-divider"></li>
               ${menu}<li><hr class="dropdown-divider"></li><li><button class="dropdown-item text-danger" type="button" data-logout><i class="bi bi-box-arrow-right"></i> Logout</button></li></ul></div>`
-        : `<button type="button" class="bys-login-link border-0 bg-transparent" data-login>Log in</button><button type="button" class="bys-btn-brand" data-register>Register</button>`}
+        : `<button type="button" class="bys-btn-brand lt-login-btn" data-login><i class="bi bi-person-circle" aria-hidden="true"></i> Login</button>`}
           <button class="bys-icon-btn bys-menu-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#ltMobileMenu" aria-controls="ltMobileMenu" aria-label="Open menu"><i class="bi bi-list"></i></button>
         </div>
       </div>
@@ -49,7 +49,7 @@ window.LT = window.LT || {};
         <p class="lt-m-head">Lab tests</p>
         ${[['Search Tests', 'search.html'], ['Health Packages', 'packages.html'], ['Lab Cart', 'cart.html'], ['My Appointments', 'appointments.html'], ['My Reports', 'reports.html'], ['Prescription Requests', 'my-requests.html']].map(([l, h]) => `<a class="bys-m-link" href="${url(h)}">${l} <i class="bi bi-chevron-right"></i></a>`).join('')}
         <button type="button" class="bys-m-link w-100 border-0 bg-transparent text-start" data-family>Family Members <i class="bi bi-chevron-right"></i></button>
-        ${user.loggedIn ? `<button type="button" class="bys-btn-brand-outline w-100 mt-4" data-logout>Logout</button>` : `<button type="button" class="bys-btn-brand w-100 mt-4" data-login>Log in / Register</button>`}
+        ${user.loggedIn ? `<button type="button" class="bys-btn-brand-outline w-100 mt-4" data-logout>Logout</button>` : `<button type="button" class="bys-btn-brand w-100 mt-4" data-login>Login</button>`}
         <div class="bys-m-contact"><a href="mailto:support@shrigodahealthcare.com"><i class="bi bi-envelope"></i> support@shrigodahealthcare.com</a><a href="https://wa.me/919830024236"><i class="bi bi-whatsapp"></i> +91 98300 24236</a></div>
       </div>
     </div>`;
@@ -59,9 +59,26 @@ window.LT = window.LT || {};
   function labBar() {
     const s = LT.store.get(), loc = s.location.pincode ? `${s.location.area || s.location.city} ${s.location.pincode}` : 'Select location';
     const nav = [['labtests', 'Lab Tests', 'index.html', 'eyedropper'], ['search', 'Search', 'search.html', 'search'], ['packages', 'Packages', 'packages.html', 'box2-heart'], ['appointments', 'Appointments', 'appointments.html', 'calendar-check'], ['reports', 'Reports', 'reports.html', 'file-earmark-medical']];
-    return `<div class="lt-labbar"><nav class="lt-labnav" aria-label="Lab tests">${nav.map(([k, l, h, i]) => `<a href="${url(h)}" class="${opts.active === k ? 'is-active' : ''}" ${opts.active === k ? 'aria-current="page"' : ''}><i class="bi bi-${i}"></i>${l}</a>`).join('')}</nav>
-      <div class="lt-hchips"><button type="button" class="lt-hchip" data-change-location aria-label="Change location: ${U().esc(loc)}"><i class="bi bi-geo-alt-fill"></i><span>${U().esc(loc)}</span><i class="bi bi-chevron-down small"></i></button>
-      <button type="button" class="lt-hchip is-mode" data-toggle-mode aria-label="Collection mode: ${s.mode === 'centre' ? 'Lab Centre' : 'Home Collection'}. Click to switch"><i class="bi bi-${s.mode === 'centre' ? 'hospital' : 'house-heart'}"></i><span>${s.mode === 'centre' ? 'Lab Centre' : s.mode === 'home' ? 'Home Collection' : 'Choose mode'}</span><i class="bi bi-arrow-left-right small"></i></button></div></div>`;
+    return `<div class="lt-labbar">
+                <nav class="lt-labnav" aria-label="Lab tests">${nav.map(([k, l, h, i]) => `
+                  <a href="${url(h)}" class="${opts.active === k ? 'is-active' : ''}" ${opts.active === k ? 'aria-current="page"' : ''}><i class="bi bi-${i}"></i>${l}</a>`).join('')}
+                </nav>
+                <div class="lt-hchips">
+                  <button type="button" class="lt-hchip" data-change-location aria-label="Change location: ${U().esc(loc)}" title="${U().esc(loc)}">
+                      <i class="bi bi-geo-alt-fill"></i>
+                      ${s.location.pincode
+                        /* area shortens with "..." when space runs out; the pincode is always shown in full */
+                        ? `<span class="lt-hchip-txt"><span class="lt-hchip-area">${U().esc(s.location.area || s.location.city)}</span><span class="lt-hchip-pin">${U().esc(s.location.pincode)}</span></span>`
+                        : `<span class="lt-hchip-txt"><span class="lt-hchip-area">${U().esc(loc)}</span></span>`}
+                      <i class="bi bi-chevron-down small"></i>
+                  </button>
+                  <button type="button" class="lt-hchip is-mode" data-toggle-mode aria-label="Collection mode: ${s.mode === 'centre' ? 'Lab Centre' : 'Home Collection'}. Click to switch" title="${s.mode === 'centre' ? 'Lab Centre' : s.mode === 'home' ? 'Home Collection' : 'Choose mode'}">
+                    <i class="bi bi-${s.mode === 'centre' ? 'hospital' : 'house-heart'}"></i>
+                    <span class="lt-hchip-txt"><span class="lt-hchip-area">${s.mode === 'centre' ? 'Lab Centre' : s.mode === 'home' ? 'Home Collection' : 'Choose mode'}</span></span>
+                    <i class="bi bi-arrow-left-right small"></i>
+                  </button>
+                </div>
+            </div>`;
   }
 
   /* ---------- footer (same structure as the BeyondSure site footer) ---------- */
@@ -80,7 +97,6 @@ window.LT = window.LT || {};
           <li><i class="bi bi-geo-alt"></i><span>203, Shivam Square, 4 Sahar Road, Andheri (E), Mumbai 400069, Maharashtra, India</span></li></ul></div>
         ${col('Lab Tests', [['Book a Lab Test', url('search.html')], ['Upload Prescription', url('prescription-upload.html')], ['Search Tests', url('search.html')], ['Health Packages', url('packages.html')], ['Lab Cart', url('cart.html')]])}
         ${col('My Account', [['My Appointments', url('appointments.html')], ['My Reports', url('reports.html')], ['Prescription Requests', url('my-requests.html')], ['Family Members', '#family']])}
-        ${col('For Labs', [['Partner Registration', url('lab-partner/register.html')], ['Lab Dashboard (demo)', url('lab-partner/dashboard.html')], ['Admin Approvals (demo)', url('admin/lab-approvals.html')]])}
         ${col('Services', [['Teleconsultation', site('doctor/find-doctor.html')], ['Medicine Delivery', site('medicines/index.html')], ['Dental Care', site('dental/index.html')], ['Health Shop', site('shop/shop.html')]])}
       </div>
       <div class="bys-ft-bottom"><nav aria-label="Footer"><a href="${site('index.html#services')}">Services</a><a href="${url('index.html')}">Lab Tests</a><a href="${site('index.html#faq')}">FAQ</a><a href="${site('index.html#contact')}">Contact</a><button type="button" class="lt-reset-link" data-reset-demo>Reset demo data</button></nav>
@@ -125,12 +141,30 @@ window.LT = window.LT || {};
       b.classList.toggle('is-added', on); b.setAttribute('aria-pressed', on);
       if (!b.dataset.keepLabel) b.innerHTML = on ? '<i class="bi bi-check2"></i> Added' + (n > 1 ? ' · ' + n : '') : '<i class="bi bi-plus-lg"></i> ' + (b.dataset.label || 'Add');
     });
+    /* lab tag on test / package cards (top-right): the booking's lab on every card once a lab is chosen */
+    document.querySelectorAll('[data-cardlab]').forEach((el) => { el.outerHTML = U().cardLab(el.dataset.cardlab); });
   }
 
-  /* every add opens login (if needed) -> "Select Member" popup; an added item re-opens it to edit */
+  /* Add on a test / package card: login (if needed) -> added to the lab cart for Self (no member popup –
+     family members are chosen on the Lab Cart page). Tapping "Added" removes it again (with Undo).
+     The FIRST test (no lab chosen yet) then opens the lab side-bar "Choose a lab"; later tests keep that lab
+     (no side-bar) – the lab is changed on the Compare labs page. */
+  const cartChanged = () => { updateCart(); if (LT.page && LT.page.onCartChange) LT.page.onCartChange(); };
   async function handleAdd(id) {
-    await LT.members.pick(id, { onChange: () => { updateCart(); if (LT.page && LT.page.onCartChange) LT.page.onCartChange(); } });
-    updateCart();
+    const it = LT.pricing.item(id) || {}, name = it.short || it.name || 'Test';
+    if (LT.cart.has(id)) {
+      const removed = LT.cart.remove(id); cartChanged();
+      U().toast(name + ' removed from your lab cart', 'info', { action: 'Undo', onAction: () => { LT.cart.restore(removed); cartChanged(); } });
+      return;
+    }
+    const r = await LT.members.quickAdd(id);
+    cartChanged();
+    if (!r) return;
+    U().toast(r.member ? name + ' added for ' + r.member.name.split(' ')[0] + '. Book it for family members in your cart.' : name + ' added. Choose who it is for in your cart.',
+      r.member ? 'success' : 'warning', { action: 'View cart', onAction: () => { location.href = url('cart.html'); } });
+    const tag = LT.api.labTag(id);
+    if (!tag) { if (LT.labPicker && opts.labPicker !== false) LT.labPicker.open(id); return; }
+    if (!tag.offered) U().toast((LT.pricing.item(id) || {}).name + ' is not available at ' + tag.name + '. You can change the lab on the Compare labs page.', 'warning');
   }
 
   async function switchMode(next) {
@@ -176,9 +210,9 @@ window.LT = window.LT || {};
     if (new URLSearchParams(location.search).get('demo') === '1') sessionStorage.removeItem('lt_demo_off');
     if (sessionStorage.getItem('lt_demo_off')) return '';
     const pages = [['index.html', 'Landing (Phase 1-4)'], ['prescription-upload.html', 'Prescription upload (6)'], ['my-requests.html', 'My requests'],
-    ['search.html', 'Search tests (7)'], ['test-detail.html?id=cbc', 'Test detail'], ['packages.html', 'Packages'], ['cart.html', 'Cart & members (8-10)'], ['select-lab.html', 'Select lab (11)'],
+    ['search.html', 'Search tests (7)'], ['test-detail.html?id=cbc', 'Test detail'], ['packages.html', 'Packages'], ['cart.html', 'Cart & members (8-10)'], ['compare-labs.html', 'Compare labs (11)'],
     ['location.html', 'Location (12)'], ['slot.html', 'Slot (13)'], ['summary.html', 'Summary & pay (14)'], ['appointments.html', 'Appointments (15)'], ['appointment-detail.html?id=LT-2026-004821', 'Appointment detail'],
-    ['reports.html', 'Reports (19)'], ['report-view.html?id=r-1001', 'Report view'], ['lab-partner/register.html', 'Lab registration'], ['lab-partner/dashboard.html', 'Lab dashboard'], ['admin/lab-approvals.html', 'Admin approvals']];
+    ['reports.html', 'Reports (19)'], ['report-view.html?id=r-1001', 'Report view']];
     const s = LT.store.get();
     return `<div class="lt-demo" id="ltDemo"><button type="button" class="lt-demo-btn" aria-expanded="false" aria-controls="ltDemoPanel"><i class="bi bi-tools"></i><span>Demo tools</span></button>
       <div class="lt-demo-panel" id="ltDemoPanel" hidden>
@@ -271,6 +305,24 @@ window.LT = window.LT || {};
     } catch (e) { U().error(el.querySelector('[data-sum]'), { text: U().errMsg(e), onRetry: () => renderAside(el, o) }); }
   }
 
+  /* ---------- mobile bottom app menu (every customer page; phones only – lab.css "Mobile bottom app menu") ----------
+     Lab Tests · Packages · Cart (centre button + count) · Appointments · Reports. The active tab follows the page
+     (booking steps highlight Cart). Not shown when a page mounts with active: ''. The cart count
+     uses [data-lt-count], so updateCart() keeps it current. */
+  const BNAV_TAB = { index: 'labtests', search: 'labtests', 'test-detail': 'labtests', 'prescription-upload': 'labtests', 'my-requests': 'labtests',
+    packages: 'packages', cart: 'cart', 'compare-labs': 'cart', location: 'cart', slot: 'cart', summary: 'cart', confirmation: 'appointments',
+    appointments: 'appointments', 'appointment-detail': 'appointments', reports: 'reports', 'report-view': 'reports' };
+  function bottomNav() {
+    if (document.getElementById('ltBottomNav') || !opts.active) return;
+    const on = BNAV_TAB[document.body.dataset.ltPage] || opts.active;
+    const tab = (k, label, href, icon) => `<a class="lt-bnav-tab ${on === k ? 'is-active' : ''}" href="${url(href)}" ${on === k ? 'aria-current="page"' : ''}><i class="bi bi-${icon}${on === k ? '-fill' : ''}" aria-hidden="true"></i><span>${label}</span></a>`;
+    document.body.insertAdjacentHTML('beforeend', `<nav class="lt-bnav" id="ltBottomNav" aria-label="App menu">
+      ${tab('labtests', 'Lab Tests', 'index.html', 'house-heart')}${tab('packages', 'Packages', 'packages.html', 'box2-heart')}
+      <a class="lt-bnav-tab is-cart ${on === 'cart' ? 'is-active' : ''}" href="${url('cart.html')}" aria-label="Lab cart" ${on === 'cart' ? 'aria-current="page"' : ''}><span class="lt-bnav-fab"><i class="bi bi-cart3" aria-hidden="true"></i><span class="lt-bnav-badge" data-lt-count hidden>0</span></span><span>Cart</span></a>
+      ${tab('appointments', 'Appointments', 'appointments.html', 'calendar-check')}${tab('reports', 'Reports', 'reports.html', 'file-earmark-medical')}</nav>`);
+    document.body.classList.add('lt-has-bnav');
+  }
+
   /* ---------- mount ---------- */
   function mount(o) {
     opts = o || {};
@@ -292,6 +344,7 @@ window.LT = window.LT || {};
       document.body.appendChild(bar);
     }
     document.body.insertAdjacentHTML('beforeend', demoTools() + '<div class="lt-offline" id="ltOffline" role="alert" hidden><i class="bi bi-wifi-off"></i> You are offline. Changes will be saved on this device.</div>');
+    bottomNav();
     if (o.title) document.title = o.title + ' – BeyondSure Lab Tests';
     bindGlobal();
     updateCart();

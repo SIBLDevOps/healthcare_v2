@@ -10,7 +10,7 @@
   let addresses = [], lab = null, validation = null;
 
   app.innerHTML = `<div class="lt-container"><div class="lt-page-head"><h1>${centre ? 'Confirm your lab centre' : 'Select collection address'}</h1><p>${centre ? 'All selected members visit this centre together at the slot you pick next.' : 'Our technician will come to this address. One address per booking.'}</p></div>
-    <div class="row g-4 mt-4"><div class="col-lg-8" data-main></div><aside class="col-lg-4"><div class="lt-aside" data-aside></div></aside></div></div>`;
+    <div class="row g-4  mt-md-4"><div class="col-lg-8" data-main></div><aside class="col-lg-4"><div class="lt-aside" data-aside></div></aside></div></div>`;
   const main = app.querySelector('[data-main]');
   const dir = (c) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(c.name + ', ' + c.address);
 
@@ -19,7 +19,8 @@
     const pin = LT.store.get().location.pincode, area = LT.store.get().location.area || LT.store.get().location.city;
     main.innerHTML = `<div class="lt-addr-head"><div><h2 class="lt-h2 mb-1">Saved addresses</h2><p class="mb-0 small">Showing addresses in <b class="lt-ink">${esc(area)} ${esc(pin)}</b> – the location you chose for this booking.</p></div>
         <button type="button" class="btn lt-btn-outline lt-btn-sm" data-add><i class="bi bi-plus-lg"></i> Add New Address</button></div>
-      <div class="lt-addr lt-addr-grid mt-3" data-list role="radiogroup" aria-label="Saved addresses in ${esc(pin)}"></div>
+      <p class="lt-consent-err lt-addr-err" id="ltAddrErr" data-addrerr role="alert" hidden></p>
+      <div class="lt-addr lt-addr-grid mt-3" data-list role="radiogroup" aria-label="Saved addresses in ${esc(pin)}" aria-describedby="ltAddrErr"></div>
       <div data-other class="mt-3"></div><div data-val class="mt-3" aria-live="polite"></div>`;
     main.querySelector('[data-add]').onclick = () => form();
     await loadAddresses();
@@ -58,14 +59,29 @@
       else { validation = null; main.querySelector('[data-val]').innerHTML = ''; setBar(); }
     } catch (e) { error(list, { text: errMsg(e), onRetry: loadAddresses }); }
   }
+  /* "Confirm & Proceed" without a usable address: scroll to the problem, red highlight + message */
+  function addressError(on) {
+    const list = main.querySelector('[data-list]'), msg = main.querySelector('[data-addrerr]'); if (!list || !msg) return;
+    list.classList.toggle('is-error', !!on); msg.hidden = !on;
+    if (!on) return;
+    const pin = LT.store.get().location.pincode, picked = addresses.find((x) => x.id === LT.store.get().address.id);
+    let target = msg, focusEl = list.querySelector('input'); // the message sits above the list: scroll to it so both are in view
+    if (!addresses.length) { msg.innerHTML = '<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i> Please add the address in ' + esc(pin) + ' where we should collect the sample.'; focusEl = list.querySelector('button, a'); }
+    else if (!picked) msg.innerHTML = '<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i> Please select the address where we should collect the sample.';
+    else { msg.hidden = true; list.classList.remove('is-error'); target = main.querySelector('[data-val]'); focusEl = target.querySelector('button'); }
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.classList.remove('is-shake'); void target.offsetWidth; target.classList.add('is-shake');
+    if (focusEl) setTimeout(() => focusEl.focus({ preventScroll: true }), 350);
+  }
   async function choose(id, silent) {
+    addressError(false);
     const a = addresses.find((x) => x.id === id);
     LT.store.set({ address: { id } });
     const box = main.querySelector('[data-val]');
     box.innerHTML = '<div class="lt-skel" style="height:50px;border-radius:14px"></div>';
     validation = await LT.api.validateAddressForLab(id, LT.store.get().lab.id);
     box.innerHTML = validation.ok ? `<div class="lt-alert is-success"><i class="bi bi-check-circle-fill"></i><div>${esc(validation.message)}</div></div>`
-      : `<div class="lt-alert is-danger" role="alert"><i class="bi bi-geo"></i><div><strong>This lab does not collect from this address.</strong><br>${esc(validation.message)}<div class="lt-alert-acts"><button type="button" class="btn lt-btn-outline btn-sm" data-chaddr>Change address</button><a class="btn lt-btn btn-sm" href="${url('select-lab.html')}">Change lab</a></div></div></div>`;
+      : `<div class="lt-alert is-danger" role="alert"><i class="bi bi-geo"></i><div><strong>This lab does not collect from this address.</strong><br>${esc(validation.message)}<div class="lt-alert-acts"><button type="button" class="btn lt-btn-outline btn-sm" data-chaddr>Change address</button><a class="btn lt-btn btn-sm" href="${url('compare-labs.html')}">Change lab</a></div></div></div>`;
     const ch = box.querySelector('[data-chaddr]'); if (ch) ch.onclick = () => main.querySelector('[data-list]').scrollIntoView({ behavior: 'smooth' });
     if (!silent && validation.ok) toast('Address selected');
     setBar();
@@ -73,7 +89,7 @@
   function setBar() {
     const a = addresses.find((x) => x.id === LT.store.get().address.id);
     const ok = a && validation && validation.ok;
-    LT.layout.setAction({ text: a ? `<b>${esc(a.type)}: ${esc(a.house.split(',')[0])}</b>${esc(a.area.split(',').slice(-1)[0].trim())}` : '<b>No address selected</b>Choose where to collect the sample', label: 'Confirm &amp; Proceed <i class="bi bi-arrow-right"></i>', disabled: !ok, hint: ok ? 'Next: choose date and time' : 'Select an address the lab serves', onClick: () => { location.href = url('slot.html'); } });
+    LT.layout.setAction({ text: a ? `<b>${esc(a.type)}: ${esc(a.house.split(',')[0])}</b>${esc(a.area.split(',').slice(-1)[0].trim())}` : '<b>No address selected</b>Choose where to collect the sample', label: 'Confirm &amp; Proceed <i class="bi bi-arrow-right"></i>', hint: ok ? 'Next: choose date and time' : 'Select an address the lab serves', onClick: () => { if (!ok) return addressError(true); location.href = url('slot.html'); } });
   }
   function form(a) {
     a = a || {};
@@ -137,9 +153,9 @@
             ${c.amenities && c.amenities.length ? `<li class="is-wide"><span class="lt-cv-ico" aria-hidden="true"><i class="bi bi-stars"></i></span><div><small>Facilities</small><div class="lt-cv-amen">${amenities(c.amenities)}</div></div></li>` : ''}
           </ul>
           <div class="lt-map lt-cv-map" role="img" aria-label="Map: ${esc(c.name)}, ${c.distanceKm} km from you"><span class="lt-pin is-me" style="left:${me.x}%;top:${me.y}%"><i class="bi bi-person-circle"></i><span>You</span></span><span class="lt-pin is-active" style="left:${c.x}%;top:${c.y}%"><i class="bi bi-geo-alt-fill"></i><span>${esc(l.initials)}</span></span></div>
-          <div class="lt-cv-acts"><a class="btn lt-btn-outline lt-btn-sm is-main" href="${dir(c)}" target="_blank" rel="noopener"><i class="bi bi-sign-turn-right"></i> Get Directions</a>${l.centres.length > 1 ? '<button type="button" class="btn lt-btn-ghost lt-btn-sm" data-chc><i class="bi bi-arrow-left-right"></i> Change centre</button>' : ''}<a class="btn lt-btn-ghost lt-btn-sm" href="${url('select-lab.html')}"><i class="bi bi-building"></i> Change lab</a></div>
+          <div class="lt-cv-acts"><a class="btn lt-btn-outline lt-btn-sm is-main" href="${dir(c)}" target="_blank" rel="noopener"><i class="bi bi-sign-turn-right"></i> Get Directions</a>${l.centres.length > 1 ? '<button type="button" class="btn lt-btn-ghost lt-btn-sm" data-chc><i class="bi bi-arrow-left-right"></i> Change centre</button>' : ''}<a class="btn lt-btn-ghost lt-btn-sm" href="${url('compare-labs.html')}"><i class="bi bi-building"></i> Change lab</a></div>
         </section>
-        <section class="lt-card lt-cv-sec"><h3 class="lt-cv-h3"><i class="bi bi-clipboard2-check" aria-hidden="true"></i> Tests available at this centre <span class="lt-cv-count">${tests.length}${missing.length ? ' of ' + (tests.length + missing.length) : ''}</span></h3>
+        <section class="lt-card lt-cv-sec d-none"><h3 class="lt-cv-h3"><i class="bi bi-clipboard2-check" aria-hidden="true"></i> Tests available at this centre <span class="lt-cv-count">${tests.length}${missing.length ? ' of ' + (tests.length + missing.length) : ''}</span></h3>
           <ul class="lt-checklist lt-cv-tests">${tests.map((t) => `<li><i class="bi bi-check-circle-fill"></i><span>${esc(t)}</span></li>`).join('')}${missing.map((t) => `<li class="is-missing"><i class="bi bi-x-circle-fill text-danger"></i><span>${esc(LT.pricing.item(t).name)} <small class="text-danger">(not available)</small></span></li>`).join('')}</ul></section>
         <section class="lt-card lt-cv-sec"><h3 class="lt-cv-h3"><i class="bi bi-people" aria-hidden="true"></i> Visiting members <span class="lt-cv-count">${visiting.length}</span></h3>
           <div class="lt-cv-members">${visiting.map((m) => `<div class="lt-cv-member">${avatar(m.name, null, 'sm')}<div><b>${esc(m.name)}</b><small>${esc(m.relationship)}</small></div></div>`).join('')}</div>

@@ -1,7 +1,8 @@
 /* Page: slot.html – PHASE 13 Select Collection Date & Time
    Card: title + "For <members> • <lab>" chip, next 7 dates (selected date shows "N Slots"),
-   MORNING SLOTS (12 one-hour windows 05:30 AM – 12:00 PM, "Fasting Recommended" when needed),
-   2 columns on mobile / 3 on desktop, selected slot shows a tick, Confirm Slot button.
+   MORNING SLOTS (05:00 AM – 12:00 PM, "Fasting Recommended" when needed) and AFTERNOON & EVENING
+   (12:00 – 07:00 PM, no 3–4 PM slot): 13 one-hour windows, 2 columns on mobile / 3 on desktop,
+   selected slot shows a tick (one slot across both groups), Confirm Slot button.
    Confirm -> api.holdSlot (10-min hold) -> summary.html */
 (function () {
   const { esc, toast, error, errMsg, busy } = LT.ui;
@@ -58,17 +59,29 @@
 
   async function loadSlots() {
     const box = $('[data-slots]');
-    box.innerHTML = '<div class="lt-sgrid">' + '<div class="lt-skel" style="height:54px;border-radius:14px;margin:0"></div>'.repeat(12) + '</div>';
+    box.innerHTML = '<div class="lt-sgrid">' + '<div class="lt-skel" style="height:54px;border-radius:14px;margin:0"></div>'.repeat(8) + '</div>';
     try {
       const slots = await LT.api.getSlots(s0.lab.id, day, s0.mode);
       if (picked && picked.start.slice(0, 10) !== day) picked = null;
       if (picked && !slots.some((x) => x.start === picked.start && open(x))) picked = null;
-      box.innerHTML = `<div class="lt-sgroup-head"><h2><i class="bi bi-brightness-high-fill" aria-hidden="true"></i>MORNING SLOTS</h2>${app.dataset.fasting ? '<span class="lt-fast-badge">Fasting Recommended</span>' : ''}</div>
-        <div class="lt-sgrid" role="radiogroup" aria-label="Morning slots">${slots.map((x) => {
-          const on = picked && picked.start === x.start, dis = !open(x);
-          return `<button type="button" class="lt-sslot ${on ? 'is-active' : ''}" role="radio" aria-checked="${!!on}" data-s="${x.start}|${x.end}" ${dis ? 'disabled' : ''} aria-label="${fmt(x.start)} to ${fmt(x.end)}${dis ? ', unavailable' : ''}"><span>${fmt(x.start)} - ${fmt(x.end)}</span>${on ? '<i class="bi bi-check-circle-fill" aria-hidden="true"></i>' : ''}</button>`;
-        }).join('')}</div>`;
-      box.querySelector('.lt-sgrid').onclick = (e) => {
+      const slotBtn = (x) => {
+        const on = picked && picked.start === x.start, dis = !open(x);
+        return `<button type="button" class="lt-sslot ${on ? 'is-active' : ''}" role="radio" aria-checked="${!!on}" data-s="${x.start}|${x.end}" ${dis ? 'disabled' : ''} aria-label="${fmt(x.start)} to ${fmt(x.end)}${dis ? ', unavailable' : ''}"><span>${fmt(x.start)} - ${fmt(x.end)}</span>${on ? '<i class="bi bi-check-circle-fill" aria-hidden="true"></i>' : ''}</button>`;
+      };
+      /* two groups: MORNING SLOTS (fasting badge) and AFTERNOON & EVENING */
+      const groups = [
+        { key: 'morning', title: 'MORNING SLOTS', icon: 'brightness-high-fill', badge: app.dataset.fasting ? '<span class="lt-fast-badge">Fasting Recommended</span>' : '' },
+        { key: 'pm', title: 'AFTERNOON &amp; EVENING', icon: 'moon-stars-fill', badge: '' }
+      ];
+      box.innerHTML = groups.map((g) => {
+        const list = slots.filter((x) => x.period === g.key);
+        if (!list.length) return '';
+        const none = !list.some(open);
+        return `<div class="lt-sgroup is-${g.key}"><div class="lt-sgroup-head"><h2><i class="bi bi-${g.icon}" aria-hidden="true"></i>${g.title}</h2>${g.badge}</div>
+          <div class="lt-sgrid" role="radiogroup" aria-label="${g.key === 'morning' ? 'Morning' : 'Afternoon and evening'} slots">${list.map(slotBtn).join('')}</div>
+          ${none ? '<p class="lt-sgroup-none"><i class="bi bi-clock-history" aria-hidden="true"></i> These slots have passed for today. Pick another date.</p>' : ''}</div>`;
+      }).join('');
+      box.onclick = (e) => {
         const b = e.target.closest('[data-s]'); if (!b || b.disabled) return;
         const [start, end] = b.dataset.s.split('|'); picked = { start, end };
         box.querySelectorAll('[data-s]').forEach((x) => { const on = x === b; x.classList.toggle('is-active', on); x.setAttribute('aria-checked', on); const ic = x.querySelector('i'); if (on && !ic) x.insertAdjacentHTML('beforeend', '<i class="bi bi-check-circle-fill" aria-hidden="true"></i>'); if (!on && ic) ic.remove(); });

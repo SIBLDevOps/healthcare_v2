@@ -37,7 +37,7 @@
           <div class="lt-rp-table is-compact" role="table" aria-label="Report files">
             <div class="lt-rp-thead" role="row"><span role="columnheader">Report name</span><span role="columnheader">Result</span><span role="columnheader" class="text-end">Report (PDF)</span></div>
             ${files.map((f) => `<div class="lt-rp-row ${f.id === current.id && preview ? 'is-current' : ''}" role="row" data-row="${esc(f.id)}">
-              <div class="lt-rp-name" role="cell"><span class="lt-rp-pdf" aria-hidden="true"><i class="bi bi-file-earmark-pdf-fill"></i><small>PDF</small></span><div><b class="lt-rp-title">${esc(f.name)}</b><small>${f.params} parameter${f.params > 1 ? 's' : ''} · 1 page</small></div></div>
+              <div class="lt-rp-name" role="cell"><span class="lt-rp-pdf" aria-hidden="true"><i class="bi bi-file-earmark-pdf-fill"></i><small style="color:white;" >PDF</small></span><div><b class="lt-rp-title">${esc(f.name)}</b><small>${f.params} parameter${f.params > 1 ? 's' : ''} · ${f.pages || 1} page${(f.pages || 1) > 1 ? 's' : ''}</small></div></div>
               <div class="lt-rp-res" role="cell">${result(f)}</div>
               <div class="lt-rp-acts" role="cell"><button type="button" class="btn lt-btn lt-btn-sm" data-view="${esc(f.id)}" data-busy="Opening…" aria-label="View ${esc(f.name)} report"><i class="bi bi-eye"></i> View</button><button type="button" class="btn lt-btn-outline lt-btn-sm" data-dl="${esc(f.id)}" data-busy="Preparing…" aria-label="Download ${esc(f.name)} report as PDF"><i class="bi bi-download"></i> Download</button></div></div>`).join('')}
           </div>

@@ -9,21 +9,6 @@
   const app = LT.layout.mount({ active: 'labtests', showCartBar: true, hero: true });
   LT.page = { openLocation: () => gate({ forceLocation: true }) };
 
-  /* =================== MOBILE BOTTOM APP MENU ===================
-     Lab Tests · Packages · Cart (centre button + count) · Appointments · Reports.
-     Shown on phones only (< 768px); hidden on tablet and desktop by CSS
-     (lab.css, "Mobile bottom app menu"). The cart count uses [data-lt-count], so LT.layout.refresh() keeps it updated. */
-  (function bottomNav() {
-    if (document.getElementById('ltBottomNav')) return;
-    const tab = (label, href, icon, on) => `<a class="lt-bnav-tab ${on ? 'is-active' : ''}" href="${url(href)}" ${on ? 'aria-current="page"' : ''}><i class="bi bi-${icon}${on ? '-fill' : ''}" aria-hidden="true"></i><span>${label}</span></a>`;
-    document.body.insertAdjacentHTML('beforeend', `<nav class="lt-bnav" id="ltBottomNav" aria-label="App menu">
-      ${tab('Lab Tests', 'index.html', 'house-heart', true)}${tab('Packages', 'packages.html', 'box2-heart')}
-      <a class="lt-bnav-tab is-cart" href="${url('cart.html')}" aria-label="Lab cart"><span class="lt-bnav-fab"><i class="bi bi-cart3" aria-hidden="true"></i><span class="lt-bnav-badge" data-lt-count hidden>0</span></span><span>Cart</span></a>
-      ${tab('Appointments', 'appointments.html', 'calendar-check')}${tab('Reports', 'reports.html', 'file-earmark-medical')}</nav>`);
-    document.body.classList.add('lt-has-bnav');
-    LT.layout.refresh();
-  })();
-
   /* =================== SETUP GATE =================== */
   async function gate(o) {
     o = o || {};
@@ -492,7 +477,7 @@
               <button type="submit" class="bys-btn-brand fd-search-btn"><i class="bi bi-search"></i><span>Search Tests</span></button>
               <div class="lt-suggest" id="ltSug" hidden></div>
             </form>
-            <div class="lt-lhero-ctas"><a class="bys-btn-brand" href="${url('search.html')}">Book Lab Test <i class="bi bi-arrow-right"></i></a><a class="bys-btn-brand-outline" href="${url('prescription-upload.html')}"><i class="bi bi-file-earmark-arrow-up"></i> Upload Prescription</a></div>
+            <div class="lt-lhero-ctas d-none"><a class="bys-btn-brand" href="${url('search.html')}">Book Lab Test <i class="bi bi-arrow-right"></i></a><a class="bys-btn-brand-outline" href="${url('prescription-upload.html')}"><i class="bi bi-file-earmark-arrow-up"></i> Upload Prescription</a></div>
             <ul class="fd-trust"><li><i class="bi bi-patch-check-fill"></i> NABL partner labs</li><li><i class="bi bi-house-heart-fill"></i> Free home collection</li><li><i class="bi bi-file-earmark-medical-fill"></i> Reports in 24 hrs</li><li><i class="bi bi-shield-fill-check"></i> Secure payments</li></ul>
           </div>
           <div class="lt-lmedia" aria-hidden="true">${HERO_SVG}
@@ -681,7 +666,41 @@
   /* landing search with suggestions */
   function bindSearch() {
     const form = app.querySelector('[data-search]'), q = form.querySelector('input'), box = form.querySelector('#ltSug');
-    let idx = -1, opts = [];
+    let idx = -1, opts = [], raf = 0;
+    /* the hero hides anything that spills out of it, so the suggestion list lives on <body> and floats (fixed)
+       under the search bar: full list visible, opens upwards when there is more room above, never goes under
+       the sticky header or the bottom bars (app menu, cart bar) and follows the bar while scrolling */
+    document.querySelectorAll('body > .lt-hsug').forEach((x) => x.remove()); // list from an earlier render
+    document.body.appendChild(box);
+    box.classList.add('lt-hsug');
+    const shown = (el) => el && !el.hidden && getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden';
+    function limits(vh) {
+      let top = 8, bottom = vh - 8;
+      const hdr = document.getElementById('siteHeader');
+      if (shown(hdr)) { const h = hdr.getBoundingClientRect(); if (h.bottom > 0) top = Math.max(top, h.bottom + 6); }
+      [document.getElementById('ltBottomNav'), document.getElementById('ltCartBar')].forEach((el) => {
+        if (!shown(el)) return; const b = el.getBoundingClientRect(); if (b.top < vh && b.bottom > 0) bottom = Math.min(bottom, b.top - 8);
+      });
+      return { top, bottom };
+    }
+    function place() {
+      if (box.hidden) return;
+      if (!form.isConnected) { box.hidden = true; return; }
+      const f = form.getBoundingClientRect(), vh = window.innerHeight, vw = document.documentElement.clientWidth, gap = 8, lim = limits(vh);
+      if (f.bottom < lim.top || f.top > lim.bottom) { box.style.visibility = 'hidden'; return; } // search bar scrolled away
+      box.style.visibility = '';
+      const below = lim.bottom - (f.bottom + gap), above = (f.top - gap) - lim.top;
+      const up = below < 200 && above > below; // prefer opening downwards
+      box.style.left = Math.max(8, f.left) + 'px';
+      box.style.width = Math.min(f.width, vw - 16) + 'px';
+      box.style.maxHeight = Math.min(420, Math.max(up ? above : below, 96)) + 'px';
+      if (up) { box.style.top = 'auto'; box.style.bottom = (vh - f.top + gap) + 'px'; } else { box.style.bottom = 'auto'; box.style.top = (f.bottom + gap) + 'px'; }
+      box.classList.toggle('is-up', up);
+    }
+    const track = () => { place(); raf = box.hidden ? 0 : requestAnimationFrame(track); };
+    new MutationObserver(() => { if (!box.hidden && !raf) track(); }).observe(box, { attributes: true, attributeFilter: ['hidden'] });
+    window.addEventListener('scroll', place, { passive: true });
+    window.addEventListener('resize', place);
     const hl = (t, term) => esc(t).replace(new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>');
     q.addEventListener('input', debounce(async () => {
       const term = q.value.trim();
@@ -690,20 +709,8 @@
       opts = r.terms.map((t) => ({ href: url('search.html?q=' + encodeURIComponent(t)), html: `<i class="bi bi-search"></i><span>${hl(t, term)}</span>` }))
         .concat(r.items.map((t) => ({ href: url(t.type === 'package' ? 'packages.html?open=' + t.id : 'test-detail.html?id=' + t.id), html: `<i class="bi bi-${t.type === 'package' ? 'box2-heart' : 'droplet'}"></i><span>${hl(t.name, term)}</span><small>From ${money(t.fromPrice)}</small>` })));
       box.innerHTML = opts.length ? (r.terms.length ? '<div class="lt-suggest-h">Searches</div>' : '') + opts.map((o, i) => (i === r.terms.length && r.items.length ? '<div class="lt-suggest-h">Tests &amp; packages</div>' : '') + `<a class="lt-suggest-item" href="${o.href}" data-i="${i}">${o.html}</a>`).join('') : `<div class="lt-suggest-h">No match for “${esc(term)}”. Press Enter to search all tests.</div>`;
-      box.hidden = false; idx = -1; fitSug();
+      box.hidden = false; idx = -1; place();
     }, 250));
-    /* phones: the list ends above the bottom app menu / cart bar instead of going behind them */
-    function fitSug(scrolled) {
-      if (box.hidden) return;
-      box.style.maxHeight = '';
-      const bars = [document.getElementById('ltBottomNav'), document.getElementById('ltCartBar')]
-        .filter((el) => el && !el.hidden && getComputedStyle(el).display !== 'none').map((el) => el.getBoundingClientRect().top);
-      if (!bars.length) return;
-      const room = Math.min(...bars) - 8 - box.getBoundingClientRect().top;
-      if (room < 160 && scrolled !== true) { window.scrollBy({ top: 160 - room, behavior: 'instant' }); fitSug(true); return; } // bring the list into view (once)
-      if (room < box.offsetHeight) box.style.maxHeight = Math.max(120, Math.round(room)) + 'px';
-    }
-    window.addEventListener('resize', () => fitSug(true));
     q.addEventListener('keydown', (e) => {
       const items = [...box.querySelectorAll('.lt-suggest-item')];
       if (box.hidden || !items.length) return;
@@ -711,7 +718,7 @@
       if (e.key === 'Enter' && idx >= 0) { e.preventDefault(); location.href = items[idx].href; }
       if (e.key === 'Escape') box.hidden = true;
     });
-    document.addEventListener('click', (e) => { if (!form.contains(e.target)) box.hidden = true; });
+    document.addEventListener('click', (e) => { if (!form.contains(e.target) && !box.contains(e.target)) box.hidden = true; });
     form.addEventListener('submit', (e) => { e.preventDefault(); location.href = url('search.html' + (q.value.trim() ? '?q=' + encodeURIComponent(q.value.trim()) : '')); });
   }
 
