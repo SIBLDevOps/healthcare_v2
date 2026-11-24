@@ -119,6 +119,14 @@ window.LT = window.LT || {};
     const pct = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
     return `<div class="lt-price">${opts.from ? '<small class="lt-price-from text-light">From</small>' : ''}<span class="lt-price-now">${money(price)}</span>${pct ? `<del class="lt-price-mrp">${money(mrp)}</del><span class="lt-save">Save ${pct}%</span>` : ''}</div>`;
   }
+  /* lab tag (top-right of EVERY test / package card) once a lab is chosen for the booking: green = this lab does
+     the test (your tests are done there), amber "Not at <lab>" = it does not (change the lab on Compare labs) */
+  const cardLab = (id) => {
+    const tag = LT.api && LT.api.labTag ? LT.api.labTag(id) : null;
+    if (!tag) return `<span class="lt-cardlab" data-cardlab="${id}" hidden></span>`;
+    const label = tag.offered ? tag.name : 'Not at ' + tag.name;
+    return `<span class="lt-cardlab ${tag.offered ? '' : 'is-na'}" data-cardlab="${id}" title="${esc(tag.offered ? 'Your tests are done by ' + tag.name : tag.name + ' does not do this test – change the lab on Compare labs')}"><i class="bi bi-${tag.offered ? 'building-check' : 'exclamation-triangle-fill'}" aria-hidden="true"></i><span>${esc(label)}</span></span>`;
+  };
   const addBtn = (id, opts) => {
     const added = LT.cart && LT.cart.has(id);
     return `<button type="button" class="btn lt-add ${added ? 'is-added' : ''} ${opts && opts.block ? 'w-100' : ''}" data-add="${id}" aria-pressed="${added}">${added ? '<i class="bi bi-check2"></i> Added' : '<i class="bi bi-plus-lg"></i> Add'}</button>`;
@@ -127,7 +135,7 @@ window.LT = window.LT || {};
     opts = opts || {};
     const mode = LT.store.get().mode;
     const delivery = t.centreOnly ? '<span class="lt-deliv is-centre"><i class="bi bi-hospital"></i> Centre only</span>' : t.tatHours <= 6 ? '<span class="lt-deliv is-fast"><i class="bi bi-lightning-charge"></i> Express ' + t.tatHours + ' hrs</span>' : '<span class="lt-deliv"><i class="bi bi-house-heart"></i> Home collection</span>';
-    return `<article class="lt-tcard ${opts.compact ? 'is-compact' : ''}">
+    return `<article class="lt-tcard ${opts.compact ? 'is-compact' : ''}">${cardLab(t.id)}
       <div class="lt-tcard-top">${tag(t.category)}${delivery}</div>
       <h3 class="lt-tcard-name"><a href="${LT.layout.url(t.type === 'package' ? 'packages.html?open=' + t.id : 'test-detail.html?id=' + t.id)}">${esc(t.name)}</a></h3>
       <p class="lt-tcard-desc">${esc(t.description)}</p>
@@ -143,7 +151,7 @@ window.LT = window.LT || {};
   function packageCard(p, opts) {
     opts = opts || {};
     const top = p.testsDetail.slice(0, 3).map((t) => `<li><i class="bi bi-check2-circle"></i>${esc(t.short || t.name)}</li>`).join('');
-    return `<article class="lt-pcard">
+    return `<article class="lt-pcard">${cardLab(p.id)}
       <div class="lt-pcard-head"><span class="lt-tag" data-c="bone">${esc(p.lifeLabel)}</span>${p.badge ? `<span class="lt-badge-new">${esc(p.badge)}</span>` : ''}</div>
       <h3 class="lt-pcard-name">${esc(p.name)}</h3>
       <p class="lt-pcard-sub"><i class="bi bi-list-check"></i> ${p.parameters} parameters · ${p.tests.length} tests</p>
@@ -202,7 +210,7 @@ window.LT = window.LT || {};
               <div class="form-check mt-3"><input class="form-check-input" type="checkbox" id="ltAuthConsent"><label class="form-check-label small" for="ltAuthConsent">I agree to the Terms and allow BeyondSure to share my samples and reports with the partner lab.</label></div>
               <div class="lt-field-err" data-err="ok" hidden></div>
             </div>
-            <p class="lt-hint mt-2" data-demohint><i class="bi bi-info-circle"></i> Demo account: <button type="button" class="lt-linkbtn" data-fill>9876543210</button> · OTP is always <b>123456</b></p>
+            <p class="lt-hint mt-2" data-demohint><i class="bi bi-info-circle" aria-hidden="true"></i><span>Demo account: <button type="button" class="lt-linkbtn" data-fill>9876543210</button> <span class="lt-hint-sep" aria-hidden="true">·</span> OTP is always <b>123456</b></span></p>
             <button type="button" class="btn lt-btn w-100 mt-3" data-send data-busy="Sending OTP…">Get OTP</button>
             <p class="lt-auth-switch" data-switchtxt></p>
           </div>
@@ -287,7 +295,7 @@ window.LT = window.LT || {};
 
   LT.ui = {
     $, $$, esc, money, date, time, debounce, param, hours, initials, isMobile, toast, confirm, modal: { open: openModal }, skeleton, empty, error, busy, errMsg,
-    tag, priceBlock, addBtn, testCard, packageCard, statusChip, reportChip, avatar, labLogo, rating, sourceChips, amenities, authModal, requireLogin, ILLU
+    tag, priceBlock, addBtn, cardLab, testCard, packageCard, statusChip, reportChip, avatar, labLogo, rating, sourceChips, amenities, authModal, requireLogin, ILLU
   };
 })();
 

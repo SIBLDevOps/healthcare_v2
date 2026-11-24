@@ -1,6 +1,6 @@
 /* Page: appointment-detail.html?id= – PHASES 15-18, 20, 21
-   Header, status timeline (with "Advance status" demo), technician / ETA, member-wise tests and
-   reports, preparation reminders, centre QR + check-in, bill, actions: reschedule (same lab, max 2,
+   Header, status timeline (with "Advance status" demo), technician / ETA, Members & reports (one open / close
+   panel per member: every test, its result chips and View / PDF, or when the report is expected), preparation reminders, centre QR + check-in, bill, actions: reschedule (same lab, max 2,
    not within 2 hrs), cancel with refund preview, remove member, call lab, support, invoice,
    feedback after completion, repeat order, consult a doctor. */
 (function () {
@@ -45,6 +45,47 @@
       </div>`;
     }
 
+    /* Members & reports: one FAQ-style open / close panel per family member with every test and its report */
+    function memberReports() {
+      const resChips = (f) => (f.abnormal ? `<span class="lt-rchip is-abnormal"><i class="bi bi-arrow-up-circle-fill" aria-hidden="true"></i>${f.abnormal} out of range</span>` : '')
+        + (f.borderline ? `<span class="lt-rchip is-borderline"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>${f.borderline} borderline</span>` : '')
+        + (!f.abnormal && !f.borderline ? '<span class="lt-rchip is-normal"><i class="bi bi-check-circle-fill" aria-hidden="true"></i>All normal</span>' : '');
+      const due = (h) => { const d = new Date(new Date(b.slot.start).getTime() + h * 3600e3); return date(d, { day: 'numeric', month: 'short' }) + ', ' + LT.ui.time(d); };
+      const state = (m) => (m.reportStatus === 'ready' ? '<span class="lt-pill is-success"><i class="bi bi-check2-circle"></i>Report ready</span>'
+        : m.reportStatus === 'cancelled' ? '<span class="lt-pill"><i class="bi bi-x-circle"></i>Cancelled</span>'
+          : '<span class="lt-pill is-warn"><i class="bi bi-hourglass-split"></i>In progress</span>');
+      const testRow = (m, x) => {
+        const ready = m.reportStatus === 'ready' && x.file;
+        const pc = ready ? x.file.params : x.parameters, meta = [pc ? pc + ' parameter' + (pc > 1 ? 's' : '') : '', x.sampleType, money(x.price)].filter(Boolean).join(' · ');
+        return `<li class="lt-mr-test ${ready ? 'is-ready' : ''}">
+          <span class="lt-mr-ico" aria-hidden="true"><i class="bi bi-${ready ? 'file-earmark-medical-fill' : m.reportStatus === 'cancelled' ? 'x-circle' : 'hourglass-split'}"></i></span>
+          <div class="lt-mr-tmain"><b>${esc(x.name)}</b><small>${meta}</small>
+            <div class="lt-mr-tstate">${ready ? resChips(x.file) + (x.file.combined ? '<span class="lt-mr-note">In the combined report</span>' : `<span class="lt-mr-note is-pdf"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> PDF · ${x.file.pages} page${x.file.pages > 1 ? 's' : ''}</span>`)
+              : m.reportStatus === 'cancelled' ? '<span class="lt-mr-note">Not tested – booking cancelled</span>'
+                : `<span class="lt-mr-note"><i class="bi bi-clock-history" aria-hidden="true"></i> Report expected by ${due(x.tatHours)}</span>`}</div></div>
+          ${ready ? `<div class="lt-mr-acts lt-noprint"><button type="button" class="btn lt-btn lt-btn-sm" data-rview="${m.reportId}|${x.file.id}" aria-label="View ${esc(x.name)} report"><i class="bi bi-eye"></i><span>View</span></button><button type="button" class="btn lt-btn-outline lt-btn-sm" data-rdl="${m.reportId}|${x.file.id}" aria-label="Download ${esc(x.name)} report"><i class="bi bi-download"></i><span>PDF</span></button></div>` : ''}
+        </li>`;
+      };
+      const panel = (m, i) => {
+        const n = m.tests.length, flagged = m.tests.reduce((s, x) => s + (x.file ? x.file.abnormal : 0), 0);
+        const sub = m.reportStatus === 'ready' ? `${n} test${n > 1 ? 's' : ''} · reported ${date(m.reportDate, { day: 'numeric', month: 'short' })}${flagged ? ' · <span class="text-danger">' + flagged + ' out of range</span>' : ''}`
+          : m.reportStatus === 'cancelled' ? `${n} test${n > 1 ? 's' : ''} · cancelled` : `${n} test${n > 1 ? 's' : ''} · reports in progress`;
+        return `<details class="lt-acc lt-mr" ${i === 0 ? 'open' : ''}>
+          <summary class="lt-acc-sum">${avatar(m.name, LT.members ? LT.members.color(m.memberId) : null, 'sm')}
+            <span class="lt-acc-txt"><b>${esc(m.name)} <span class="lt-mr-rel">${esc(m.relationship)}</span></b><small>${sub}</small></span>
+            <span class="lt-mr-state">${state(m)}</span>
+            <span class="lt-acc-chev" aria-hidden="true"><i class="bi bi-chevron-down"></i></span></summary>
+          <div class="lt-acc-body"><ul class="lt-mr-tests">${m.tests.map((x) => testRow(m, x)).join('')}</ul>
+            <div class="lt-mr-foot"><span>Tests total <b>${money(m.tests.reduce((s, x) => s + x.price, 0))}</b></span>
+              ${m.reportStatus === 'ready' ? `<a class="btn lt-btn-ghost lt-btn-sm lt-noprint" href="${url('report-view.html?id=' + m.reportId)}"><i class="bi bi-file-earmark-medical"></i> Open full report</a>` : ''}</div></div>
+        </details>`;
+      };
+      const ready = b.membersView.filter((m) => m.reportStatus === 'ready').length;
+      return `<section class="lt-card lt-mr-card"><div class="lt-card-title"><h2><i class="bi bi-person-lines-fill"></i> Members &amp; reports</h2>
+          <span class="lt-mr-count">${ready ? ready + ' of ' + b.membersView.length + ' ready' : b.membersView.length + ' member' + (b.membersView.length > 1 ? 's' : '')}</span></div>
+        <div class="lt-mr-list">${b.membersView.map(panel).join('')}</div></section>`;
+    }
+
     main.innerHTML = `<section class="lt-card"><div class="d-flex flex-wrap justify-content-between gap-3 align-items-start">
         <div class="d-flex gap-3 align-items-center">${labLogo(b.lab)}<div><div class="d-flex flex-wrap gap-2 align-items-center"><h1 class="h4 fw-bold mb-0">${esc(b.id)}</h1>${statusChip(b.status)}</div><p class="mb-0 mt-1"><b class="lt-ink">${esc(b.lab.name)}</b> · ${esc(b.lab.phone)}</p></div></div>
         <div class="lt-acts lt-noprint"><a class="btn lt-btn-outline lt-btn-sm" href="tel:${b.lab.phone.replace(/\s/g, '')}"><i class="bi bi-telephone"></i> Call lab</a><button type="button" class="btn lt-btn-ghost lt-btn-sm" data-support><i class="bi bi-headset"></i> Support</button><button type="button" class="btn lt-btn-ghost lt-btn-sm" data-inv><i class="bi bi-receipt"></i> Invoice</button></div></div>
@@ -53,23 +94,7 @@
         ${b.cancel.attachment ? `<div class="lt-cn-att">${b.cancel.attachment.preview ? `<button type="button" class="lt-cn-att-chip" data-att><img src="${b.cancel.attachment.preview}" alt=""><span>${esc(b.cancel.attachment.name)}</span><i class="bi bi-eye"></i></button>` : `<span class="lt-cn-att-chip"><i class="bi bi-file-earmark-pdf-fill text-danger"></i><span>${esc(b.cancel.attachment.name)}</span><small>${kb(b.cancel.attachment.size)}</small></span>`}</div>` : '<br>'}Refund: <b>${b.cancel.refundPct}%</b>${b.cancel.refundAmount != null ? ' (' + money(b.cancel.refundAmount) + ')' : ''} · Status: <b>${esc(b.cancel.refundStatus)}</b> · usually 5-7 working days to your original payment method.</div></div>` : ''}
       <div class="row g-4 mt-1"><div class="col-lg-7">
         <section class="lt-card"><div class="lt-card-title"><h2><i class="bi bi-signpost-split"></i> Tracking</h2>${!cancelled && !done ? '<button type="button" class="lt-linkbtn small lt-noprint" data-advance><i class="bi bi-skip-forward"></i> Advance status (demo)</button>' : ''}</div><ol class="lt-tl">${timeline}</ol></section>
-        <section class="lt-card"><div class="lt-card-title"><h2><i class="bi bi-person-lines-fill"></i> Members &amp; reports</h2></div>${b.membersView.map((m) => `<div class="lt-member-report-item py-3 border-top">
-          <div class="lt-member-report-main">
-            ${avatar(m.name, null, 'sm')}
-            <div class="lt-member-report-info">
-              <div class="d-flex align-items-center gap-2 flex-wrap">
-                <b class="lt-ink">${esc(m.name)}</b>
-                <span class="lt-pill lt-pill-subtle">${esc(m.relationship)}</span>
-              </div>
-              <div class="small text-muted mt-1 lt-member-report-tests">
-                <i class="bi bi-cart3 text-primary me-1"></i>${m.tests.map((t) => esc(t.name)).join(' · ')}
-              </div>
-            </div>
-          </div>
-          <div class="lt-member-report-act">
-            ${m.reportStatus === 'ready' ? `<a class="btn lt-btn lt-btn-sm" href="${url('report-view.html?id=' + m.reportId)}"><i class="bi bi-file-earmark-medical"></i> View report</a>` : m.reportStatus === 'cancelled' ? '<span class="lt-pill">Cancelled</span>' : '<span class="lt-pill is-warn"><i class="bi bi-hourglass-split"></i>Report not ready</span>'}
-          </div>
-        </div>`).join('')}</section>
+        ${memberReports()}
         ${done ? `<section class="lt-band"><div class="d-flex flex-wrap gap-3 align-items-center justify-content-between"><div><h2 class="h5 fw-bold">Consult a doctor about your report</h2><p class="mb-0">Talk to a certified doctor on video and understand what your numbers mean.</p></div><a class="btn lt-btn-light" href="${LT.layout.site('doctor/find-doctor.html')}"><i class="bi bi-camera-video"></i> Consult now</a></div></section>` : ''}
       </div><div class="col-lg-5">
         ${!cancelled && !done ? `<section class="lt-card"><div class="lt-card-title"><h2><i class="bi bi-clipboard2-pulse"></i> Preparation reminders</h2></div><ul class="lt-checklist">${b.fastingHours ? `<li><i class="bi bi-cup-hot text-warning"></i><span><b>Fast ${b.fastingHours}-12 hrs</b> before ${LT.ui.time(b.slot.start)}. Stop eating by ${LT.ui.time(new Date(new Date(b.slot.start).getTime() - Math.max(10, b.fastingHours) * 3600e3))} the night before.</span></li>` : '<li><i class="bi bi-check-circle-fill"></i>No fasting needed.</li>'}<li><i class="bi bi-droplet"></i>Drink water – it makes collection easier.</li><li><i class="bi bi-capsule"></i>Take regular medicines after the sample unless your doctor says otherwise.</li><li><i class="bi bi-person-vcard"></i>Keep photo IDs ready for all members.</li></ul></section>` : ''}
@@ -100,7 +125,9 @@
     on('[data-att]', () => viewAttachment(b.cancel.attachment));
     on('[data-rmmember]', removeMember);
     on('[data-feedback]', feedback);
-    on('[data-repeat]', async (e) => { await busy(e.currentTarget, () => LT.api.repeatOrder(b.id)); LT.layout.flash('Same tests and members loaded. Pick a lab to continue.'); location.href = url('select-lab.html'); });
+    on('[data-rview]', (e) => { const [rid, fid] = e.currentTarget.dataset.rview.split('|'); LT.reportPdf.openTab(rid, fid, e.currentTarget); });
+    on('[data-rdl]', (e) => { const [rid, fid] = e.currentTarget.dataset.rdl.split('|'); LT.reportPdf.download(rid, fid, e.currentTarget); });
+    on('[data-repeat]', async (e) => { await busy(e.currentTarget, () => LT.api.repeatOrder(b.id)); LT.layout.flash('Same tests and members loaded. Pick a lab to continue.'); location.href = url('compare-labs.html'); });
     if (!acted) { acted = true; const a = param('action'); if (a === 'reschedule' && b.canChange) setTimeout(reschedule, 300); if (a === 'cancel' && b.isUpcoming) setTimeout(cancel, 300); if (done && !b.review && param('feedback') !== '0' && sessionStorage.getItem('lt_fb_' + b.id) !== '1') { sessionStorage.setItem('lt_fb_' + b.id, '1'); setTimeout(feedback, 900); } }
   }
 
